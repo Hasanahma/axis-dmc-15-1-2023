@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="client_tree_view" model="ir.ui.view">
+            <field name="name">rooming.list</field>
+            <field name="model">clients</field>
+            <field name="arch" type="xml">
+                <tree string="Rooming List" editable="bottom">
+                    <field name="sale_order_id"/>
+                    <field name="name"/>
+                    <field name="age"/>
+                    <field name="room_type_id"/>
+                    <field name="rn"/>
+                    <field name="note"/>
+                    <field name="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="open_client_tree_view" model="ir.actions.act_window">
+            <field name="name">Rooming List</field>
+            <field name="res_model">clients</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="client_menu"
+                  name="Rooming List"
+                  parent="sale.sale_menu_root"
+                  sequence="200"
+                  action="open_client_tree_view"/>
+    </data>
+
+
+
+</odoo>

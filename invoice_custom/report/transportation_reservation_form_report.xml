@@ -1,0 +1,740 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <!--        <report string="transportation reservation form report"-->
+        <!--                id="action_transportation_reservation_form_report"-->
+        <!--                model="transportation.reservation.form"-->
+        <!--                name="invoice_custom.transportation_reservation_view"-->
+        <!--                file="invoice_custom.transportation_reservation_view"-->
+        <!--                print_report_name = "('ggggg.pdf')"-->
+        <!--                report_type="qweb-pdf"/>-->
+
+        <!--        <record id="hr_employee_print_badge" model="ir.actions.report">-->
+        <!--        <field name="name">Print Badge</field>-->
+        <!--        <field name="model">hr.employee</field>-->
+        <!--        <field name="report_type">qweb-pdf</field>-->
+        <!--        <field name="report_name">hr.print_employee_badge</field>-->
+        <!--        <field name="report_file">hr.print_employee_badge</field>-->
+        <!--        <field name="print_report_name">'Print Badge - %s' % (object.name).replace('/', '')</field>-->
+        <!--        <field name="binding_model_id" ref="model_hr_employee"/>-->
+        <!--        <field name="binding_type">report</field>-->
+        <!--    </record>-->
+
+        <record id="action_transportation_reservation_form_report" model="ir.actions.report">
+            <field name="name">Transportation Form</field>
+            <field name="model">transportation.reservation.form</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">invoice_custom.transportation_reservation_view</field>
+            <field name="report_file">invoice_custom.transportation_reservation_view</field>
+            <field name="binding_type">report</field>
+            <field name="print_report_name">('hhhhh.pdf')</field>
+            <field name="binding_model_id" ref="model_transportation_reservation_form"/>
+            <field name="binding_type">report</field>
+
+        </record>
+
+        <template id="transportation_reservation_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout" style="background:unset">
+                    <div class="page">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            .o_boxed_footer{
+                            margin-top:50px !important;
+
+                            }
+                        </style>
+                        <t t-if="selected_show_reservation">
+                            <h4 style="text-align:center">TRANSPORTATION RESERVATION</h4>
+                        </t>
+                        <t t-if="selected_show_voucher">
+                            <h4 style="text-align:center">TRANSPORTATION VOUCHER</h4>
+                        </t>
+
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+
+                                <tr>
+                                    <td style="border-right: none;">
+                                        <b>To:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="transportations_id.name.name"/>
+                                    </td>
+                                    <td style="border-right: none;">
+                                        <b>File No:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="sale_order_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Group Name:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="sale_order_id.customer"/>
+                                    </td>
+                                    <td style="border-right: none;">
+                                        <b>Issue Date:</b>
+
+                                    </td>
+                                    <td colspan="3">
+                                        <span style="margin-left:50px;"
+                                              t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <t t-if="transportation_ids">
+                            <h6 style="text-align:left">With the following transportation services</h6>
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            From Date
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            To Date
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Type Of Vehicle
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Pax
+                                        </td>
+                                        <t t-if="show_note">
+                                            <td style="border: 1px black solid; text-align:center;">
+                                                Notes
+                                            </td>
+                                        </t>
+                                        <t t-if="show_add_note">
+                                            <td style="border: 1px black solid; text-align:center;">
+                                                Add. Notes
+                                            </td>
+                                        </t>
+                                        <td style="display:none;">
+                                    </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="seq" t-value="1"/>
+
+                                <tr t-foreach="selected_transportation" t-as="t">
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="seq"/>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="t.get('date_from')">
+                                            <span t-esc="t['date_from']"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="t.get('date_from')">
+                                            <span t-esc="t['date_to']"/>
+                                        </t>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="t.get('vehicles_id')">
+                                            <span t-esc="t['vehicles_id'][1]"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="t.get('pax')">
+                                            <span t-esc="t['pax']"/>
+                                        </t>
+                                        <t t-if="not t.get('pax')">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <t t-if="show_note">
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="transportations_id.note"/>
+                                        </td>
+                                    </t>
+                                    <t t-if="show_add_note">
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="transportations_id.additional_note"/>
+                                        </td>
+                                    </t>
+                                    <td style="display:none;">
+                                    </td>
+                                    <t t-set="seq" t-value="seq +1"/>
+
+                                </tr>
+                            </table>
+                        </t>
+
+                        <br/>
+
+                        <t t-if="sale_order_id.arrival_departure_expense_ids">
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Arr / Dep
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Date
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Border
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Flight
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Time
+                                        </td>
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Pax
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="seq" t-value="1"/>
+
+                                <tr t-foreach="sale_order_id.arrival_departure_expense_ids" t-as="arr_dep">
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="seq"/>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="arr_dep.name">
+                                            <span t-esc="arr_dep.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="arr_dep.date">
+                                            <span t-esc="arr_dep.date"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </t>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="arr_dep.border.name">
+                                            <span t-esc="arr_dep.border.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="arr_dep.flight">
+                                            <span t-esc="arr_dep.flight"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="arr_dep.time">
+                                            <span t-esc="arr_dep.time"
+                                                  t-options='{"widget": "float_time"}'/>
+                                        </t>
+                                        <t t-if="not arr_dep.time">
+                                            <span>00:00</span>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="arr_dep.pax">
+                                            <span t-esc="arr_dep.pax"/>
+                                        </t>
+                                        <t t-if="not arr_dep.pax">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="arr_dep.notes">
+                                            <span t-esc="arr_dep.notes"/>
+                                        </t>
+                                    </td>
+
+                                    <td style="display:none;">
+                                    </td>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                </tr>
+                            </table>
+                        </t>
+
+                        <br/>
+
+                        <t t-if="sale_order_id.itineraries_expense_ids">
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Date
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Program
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Type Of Service
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Guide Name
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="seq" t-value="1"/>
+
+                                <tr t-foreach="sale_order_id.itineraries_expense_ids" t-as="program">
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="seq"/>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="program.from_date">
+                                            <span t-esc="program.from_date"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="program.name">
+                                            <span t-esc="program.name"/>
+                                        </t>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="program.type_service_id.name">
+                                            <span t-esc="program.type_service_id.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="program.guide_name_id.name">
+                                            <span t-esc="program.guide_name_id.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                </tr>
+                            </table>
+                        </t>
+                        <br/>
+                        <t t-if="sale_order_id.hotels_expense_ids">
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Hotel
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check IN
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check OUT
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="seq" t-value="1"/>
+
+                                <tr t-foreach="sale_order_id.hotels_expense_ids" t-as="hotels">
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="seq"/>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="hotels.name">
+                                            <span t-esc="hotels.name.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="hotels.date_from">
+                                            <span t-esc="hotels.date_from"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <t t-if="hotels.date_to">
+                                            <span t-esc="hotels.date_to"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </t>
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                </tr>
+                            </table>
+                        </t>
+
+                        <!--                        <div>-->
+                        <!--                            <h6-->
+                        <!--                            style="-->
+                        <!--                                  font-size: 1rem;-->
+                        <!--                                  font-weight: bold;-->
+                        <!--                                  margin-top: 65px;-->
+                        <!--                                  "-->
+                        <!--                            >Kind regards</h6>-->
+                        <!--                            <p style="margin-bottom: 0rem;">Admin</p>-->
+                        <!--                            <p style="margin-bottom: 0rem;">General Manger</p>-->
+                        <!--                            <p style="margin-bottom: 0rem;">Email</p>-->
+                        <!--                        </div>-->
+
+                    </div>
+                </t>
+            </t>
+
+
+        </template>
+    </data>
+</odoo>
+
+        <!--<?xml version='1.0' encoding='utf-8'?>-->
+        <!--<odoo>-->
+        <!--    <record id="action_report_restaurant_reservation_form" model="ir.actions.report">-->
+        <!--        <field name="name">Restaurant reservation form</field>-->
+        <!--        <field name="model">sale.order</field>-->
+        <!--        <field name="report_type">qweb-pdf</field>-->
+        <!--        <field name="report_name">invoice_custom.restaurant_reservation_form</field>-->
+        <!--        <field name="report_file">invoice_custom.restaurant_reservation_form</field>-->
+        <!--        <field name="binding_model_id" ref="model_sale_order"/>-->
+        <!--        <field name="binding_type">report</field>-->
+        <!--        <field name="paperformat_id" ref="custom_paper_format_qweb_report"/>-->
+        <!--    </record>-->
+
+        <!--    <template id="invoice_custom.restaurant_reservation_form">-->
+        <!--        <t t-call="web.html_container">-->
+        <!--            <t t-foreach="docs" t-as="o">-->
+        <!--                <t t-foreach="o.resturnats_expense_ids" t-as="restaurant">-->
+        <!--                    <div class="page" style="text-align:center">-->
+        <!--                        <h1>RESTAURANT RESERVATION FORM</h1>-->
+        <!--                        <div style="width:98%; border: 1px solid black; padding:1%;">-->
+        <!--                            <table>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>To:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 50%;">-->
+        <!--                                        <span t-esc="restaurant.name.name"/>-->
+        <!--                                    </td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Att:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 70%; ">Reservation Department</td>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>File No:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; ">-->
+        <!--                                        <span t-esc="o.name"/>-->
+        <!--                                    </td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>From:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 70%; "><span t-esc="o.create_uid.name"/></td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Date:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 70%; ">-->
+        <!--                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>-->
+        <!--                                    </td>-->
+        <!--                                </tr>-->
+        <!--                            </table>-->
+        <!--                        </div>-->
+        <!--                        <br/>-->
+        <!--                        <p style="text-align:left">-->
+        <!--                            <u>Kindly book and confirm the following reservation</u>-->
+        <!--                        </p>-->
+        <!--                        <br/>-->
+        <!--                        <br/>-->
+        <!--                        <table>-->
+        <!--                            <tr>-->
+        <!--                                <td style="width:10%">-->
+        <!--                                    <b>Group Name:</b>-->
+        <!--                                </td>-->
+        <!--                                <td style="margin-left:50px; width: 50%;"><span t-esc="o.customer"/></td>-->
+        <!--                            </tr>-->
+        <!--                            <tr>-->
+        <!--                                <td style="width:10%">-->
+        <!--                                    <b>Nationality:</b>-->
+        <!--                                </td>-->
+        <!--                                <td style="margin-left:50px; width: 50%;"><span t-esc="o.nationality_id.name"/></td>-->
+        <!--                            </tr>-->
+        <!--                        </table>-->
+        <!--                        <br/>-->
+        <!--                        <h2>Meals Required</h2>-->
+        <!--                        <table style="width:100%">-->
+        <!--                            <thead>-->
+        <!--                                <tr style="background-color: silver; border: 1px solid;">-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Date-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Time-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Pax-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Meal-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Notes-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Type of meal-->
+        <!--                                    </td>-->
+
+        <!--                                </tr>-->
+        <!--                            </thead>-->
+
+        <!--                            <td style="border: 1px solid; padding:5px;">-->
+        <!--                                <span t-esc="restaurant['date']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>-->
+        <!--                            </td>-->
+        <!--                            <td style="border: 1px solid; padding:5px;">-->
+        <!--                                ????-->
+        <!--                            </td>-->
+        <!--                            <td style="border: 1px solid; padding:5px;">-->
+        <!--                                <span t-esc="restaurant['pax']"/>-->
+        <!--                            </td>-->
+        <!--                            <td style="border: 1px solid; padding:5px;">-->
+        <!--                                <span t-esc="restaurant['meal_id']['name']"/>-->
+        <!--                            </td>-->
+
+        <!--                            <td style="border: 1px solid; padding:5px;">-->
+        <!--                                <span t-esc="restaurant['note']"/>-->
+        <!--                            </td>-->
+        <!--                            <td style="border: 1px solid; padding:5px;">-->
+        <!--                               ???-->
+        <!--                            </td>-->
+
+        <!--                        </table>-->
+        <!--                    </div>-->
+        <!--                    <div class="footer">-->
+        <!--                        <div class="row">-->
+        <!--                            <center>-->
+        <!--                                <span>Page</span>-->
+        <!--                                <span class="page"/>-->
+        <!--                                of-->
+        <!--                                <span class="topage"/>-->
+        <!--                            </center>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                    <p style="page-break-before:always;"></p>-->
+        <!--                </t>-->
+        <!--            </t>-->
+        <!--        </t>-->
+        <!--    </template>-->
+        <!--</odoo>-->
+
+
+        <!--<?xml version='1.0' encoding='utf-8'?>-->
+        <!--<odoo>-->
+        <!--    <record id="action_transportation_reservation_form_report" model="ir.actions.report">-->
+        <!--        <field name="name">Transportation reservation form</field>-->
+        <!--        <field name="model">sale.order</field>-->
+        <!--        <field name="report_type">qweb-pdf</field>-->
+        <!--        <field name="report_name">invoice_custom.transportation_reservation_form</field>-->
+        <!--        <field name="report_file">invoice_custom.transportation_reservation_form</field>-->
+        <!--        <field name="binding_model_id" ref="model_sale_order"/>-->
+        <!--        <field name="binding_type">report</field>-->
+        <!--        <field name="paperformat_id" ref="custom_paper_format_qweb_report"/>-->
+        <!--    </record>-->
+
+        <!--    <template id="invoice_custom.transportation_reservation_form">-->
+        <!--        <t t-call="web.html_container">-->
+        <!--            <t t-foreach="docs" t-as="o">-->
+        <!--                <t t-foreach="o.transportation_expense_ids" t-as="transportation">-->
+        <!--                    <div class="page" style="text-align:center">-->
+        <!--                        <h1>TRANSPORTATION RESERVATION FORM</h1>-->
+        <!--                        <div style="width:98%; border: 1px solid black; padding:1%;">-->
+        <!--                            <table>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>To:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 50%;">-->
+        <!--                                        <span t-esc="transportation.name.name"/>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>File No:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:70px; ">-->
+        <!--                                        <span t-esc="o.name"/>-->
+        <!--                                    </td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Att:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 50%; ">???</td>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Group Name:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:70px; ">-->
+        <!--                                        <span t-esc="o.customer"/>-->
+        <!--                                    </td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>From:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 50%; ">????</td>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Vehicle:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:70px;"><span t-esc="transportation.vehicles_id.name"/></td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Pick up:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 50%; ">-->
+        <!--                                        ???-->
+        <!--                                    </td>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Pax:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:70px;"><span t-esc="transportation.pax"/></td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Drop off:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:50px; width: 50%; ">-->
+        <!--                                        ???-->
+        <!--                                    </td>-->
+        <!--                                    <td style="width:10%">-->
+        <!--                                        <b>Entry fees:</b>-->
+        <!--                                    </td>-->
+        <!--                                    <td style="margin-left:70px;">???</td>-->
+        <!--                                </tr>-->
+        <!--                            </table>-->
+        <!--                        </div>-->
+        <!--                        <br/>-->
+        <!--                        <p style="text-align:left">-->
+        <!--                            with the following transportation services-->
+        <!--                        </p>-->
+        <!--                        <br/>-->
+        <!--                        <table style="width:100%">-->
+        <!--                            <thead>-->
+        <!--                                <tr style="background-color: silver; border: 1px solid;">-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Arr/Dep-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Date-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Border-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Carrier-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Tine-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Pax-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Notes-->
+        <!--                                    </td>-->
+        <!--                                </tr>-->
+        <!--                            </thead>-->
+
+        <!--                            <tr t-foreach="o.arrival_departure_expense_ids" t-as="arr">-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="arr['name']"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="arr['date']"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="arr['border']['name']"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    ????-->
+        <!--                                </td>-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="arr['time']"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="arr['pax']"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="arr['notes']"/>-->
+        <!--                                </td>-->
+
+        <!--                            </tr>-->
+        <!--                        </table>-->
+        <!--                        <br/>-->
+        <!--                        <br/>-->
+        <!--                        <table style="width:100%">-->
+        <!--                            <thead>-->
+        <!--                                <tr style="background-color: silver; border: 1px solid;">-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Date-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Itinerary Description-->
+        <!--                                    </td>-->
+        <!--                                    <td style="border: 1px black solid; text-align:center;">-->
+        <!--                                        Hotel Name-->
+        <!--                                    </td>-->
+        <!--                                </tr>-->
+        <!--                            </thead>-->
+
+        <!--                            <tr t-foreach="o.itineraries_expense_ids" t-as="i">-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="i['from_date']"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    <span t-esc="i['name']"/>-->
+        <!--                                </td>-->
+
+        <!--                                <td style="border: 1px solid; padding:5px;">-->
+        <!--                                    ???-->
+        <!--                                </td>-->
+        <!--                            </tr>-->
+        <!--                        </table>-->
+        <!--                        <br/>-->
+        <!--                        <div style="width:100%">-->
+        <!--                            <div style="width:90%; float:right; border:1px solid black; height: 20px;">-->
+
+        <!--                            </div>-->
+        <!--                            <div style="float:left; text-align:left">-->
+        <!--                                <strong>Notes:</strong>-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+        <!--                        <br/>-->
+        <!--                        <br/>-->
+        <!--                    </div>-->
+        <!--                </t>-->
+        <!--            </t>-->
+        <!--        </t>-->
+        <!--    </template>-->
+        <!--</odoo>-->

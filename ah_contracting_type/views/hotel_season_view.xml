@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hotel_season_search" model="ir.ui.view">
+        <field name="name">hotel.season.search</field>
+        <field name="model">hotel.season</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="hotel_season_tree" model="ir.ui.view">
+        <field name="name">hotel.season.tree</field>
+        <field name="model">hotel.season</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hotel_season_form" model="ir.ui.view">
+        <field name="name">hotel.season.form</field>
+        <field name="model">hotel.season</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hotel_season" model="ir.actions.act_window">
+        <field name="name">Hotel Season</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hotel.season</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="contact_menu_config"
+              name="Hotel Season"
+              parent="contract_menu_configuration"
+              action="action_hotel_season"
+              sequence="2"/>
+
+</odoo>

@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+
+    <record id="action_report_entrance_fees_run_down" model="ir.actions.report">
+        <field name="name">Entrance fees run down</field>
+        <field name="model">sale.custom.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.entrance_fees_run_down</field>
+        <field name="report_file">invoice_custom.entrance_fees_run_down</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report"/>
+    </record>
+
+    <template id="invoice_custom.entrance_fees_run_down">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="form" t-as="o">
+                    <div class="page" style="text-align:center">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            table {
+                            font-size: 17px;
+                            }
+                        </style>
+                        <h1>Axis DMC</h1>
+                        <h1>ENTRANCE FEES RUN DOWN REPORT</h1>
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">From Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['from_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Issue Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">To Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['to_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <br/>
+
+                        <table style="width:100%" class="table table-sm o_main_table">
+                            <thead>
+                                <tr style="background-color: silver; border: 1px solid;">
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        #
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        File No.
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Site Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Nationality
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Date
+                                    </td>
+
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Group Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Pax
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Agent Name
+                                    </td>
+
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </thead>
+                            <t t-set="total_pax" t-value="0"/>
+                            <t t-set="seq" t-value="1"/>
+                            <tr t-foreach="sorted(orders, key=lambda d: d['date']) " t-as="order">
+                             
+                                <t t-if="order['state'] == 'cancel'">
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span style="color:red;" t-esc="seq"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span style="color:red;" t-esc="order['name']"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span style="color:red;" t-esc="order['display_name']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <t t-if="order['nationality_id']">
+                                            <span style="color:red;" t-esc="order['nationality_id']"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span style="color:red;" t-esc="order['date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span style="color:red;" t-esc="order['customer']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span style="color:red;" t-esc="order['total_pax']"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span style="color:red;" t-esc="order['partner_id']"/>
+                                    </td>
+
+                                    <td style="display:none;">
+                                    </td>
+                                    <t t-set="total_pax" t-value="total_pax + order['total_pax']"/>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                </t>
+                                <t t-if="not order['state'] == 'cancel'">
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="seq"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="order['name']"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span t-esc="order['display_name']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <t t-if="order['nationality_id']">
+                                            <span t-esc="order['nationality_id']"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="order['date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="order['customer']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="order['total_pax']"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span t-esc="order['partner_id']"/>
+                                    </td>
+
+                                    <td style="display:none;">
+                                    </td>
+                                    <t t-set="total_pax" t-value="total_pax + order['total_pax']"/>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                </t>
+                            </tr>
+                            <tr style="text-align:center">
+                                <td style="border: 1px solid; padding:5px;" colspan="6">
+                                    Total Pax:
+                                </td>
+                                <td style="border: 1px solid; padding:5px;">
+                                    <span t-esc="total_pax"/>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

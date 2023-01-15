@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hotel_promotion_search" model="ir.ui.view">
+        <field name="name">hotel.promotion.search</field>
+        <field name="model">hotel.promotion</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="hotel_promotion_tree" model="ir.ui.view">
+        <field name="name">hotel.promotion.tree</field>
+        <field name="model">hotel.promotion</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hotel_promotion_form" model="ir.ui.view">
+        <field name="name">hotel.promotion.form</field>
+        <field name="model">hotel.promotion</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hotel_promotion" model="ir.actions.act_window">
+        <field name="name">Hotel Promotion</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hotel.promotion</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="contact_menu_config_hotel"
+              name="Hotel Promotion"
+              parent="contract_menu_configuration"
+              action="action_hotel_promotion"
+              sequence="3"/>
+
+</odoo>

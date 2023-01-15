@@ -1,0 +1,486 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="custom_paper_format_qweb_report_footer" model="report.paperformat">
+        <field name="name">custom report qweb paperformat</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">40</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">15</field>
+        <field name="dpi">110</field>
+    </record>
+
+    <record id="expenses_reservation_form_report_view" model="ir.actions.report">
+        <field name="name">Actual guide expense sheet</field>
+        <field name="model">expenses.sheet.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.actual_guide_expense_sheet</field>
+        <field name="report_file">invoice_custom.actual_guide_expense_sheet</field>
+        <field name="binding_model_id" ref="model_expenses_sheet_wizard"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report_footer"/>
+    </record>
+
+
+    <template id="actual_guide_expense_sheet">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+
+                <div class="page" style="text-align:center">
+                    <style>
+                        .page .header-table td{
+                        border:none !important;
+                        }
+                        .page > table tr td:last-child{
+                        background:unset !important;
+                        }
+                        table {
+                        font-size: 17px;
+                        }
+                    </style>
+                    <h1>Axis DMC</h1>
+                    <h1>ACTUAL GUIDE EXPENSE SHEET</h1>
+                    <div style="width:98%; border: 1px solid black; padding:1%;">
+                        <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                               cellpadding="0">
+                            <tr>
+                                <td style="text-align: left;">
+                                    <b style="margin-right: 10px;">File No:</b>
+                                </td>
+                                <td style="text-align: left;">
+                                    <span t-esc="sale_order_id.name"/>
+                                </td>
+                                <td style="text-align: left;">
+                                    <b style="margin-right: 10px;">Arr Date:</b>
+                                </td>
+                                <td style="text-align: left;">
+                                    <span t-esc="sale_order_id.arrival_date"
+                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <b style="margin-right: 10px;">Group Name:</b>
+                                </td>
+                                <td style="text-align: left;">
+                                    <span t-esc="sale_order_id.customer"/>
+                                </td>
+                                <td style="text-align: left;">
+                                    <b style="margin-right: 10px;">Dep Date:</b>
+                                </td>
+                                <td style="text-align: left;">
+                                    <span t-esc="sale_order_id.departure_date"
+                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <t t-if="object_expenses_sheet_wizard.guide_or_transportation == 'guide'"
+                                       t-as="guide">
+                                        <b style="margin-right: 10px;">Guide Name:</b>
+                                        <span t-esc="object_expenses_sheet_wizard.account_id.name"/>
+                                    </t>
+                                    <t t-if="object_expenses_sheet_wizard.guide_or_transportation == 'transportation'"
+                                       t-as="transportation">
+                                        <b style="margin-right: 10px;">Transportation Name:</b>
+                                        <span t-esc="object_expenses_sheet_wizard.account_id.name"/>
+                                    </t>
+
+                                </td>
+                                <td style="text-align: left;">
+
+                                </td>
+                                <td style="text-align: left;">
+                                    <b style="margin-right: 10px;">Issue Date:</b>
+                                </td>
+                                <td style="text-align: left;">
+                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </div>
+                    <br/>
+                    <br/>
+
+                    <table style="width:100%" class="table table-sm o_main_table">
+                        <tr style="text-align:center">
+                            <th colspan="3"
+                                style="background-color: silver; border: 1px black solid; text-align:center;">Itinerary
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="background-color: silver; border: 1px black solid; text-align:center;">
+                                #
+                            </td>
+                            <td style="background-color: silver; border: 1px black solid; text-align:center;">
+                                Date
+                            </td>
+                            <td style="background-color: silver; border: 1px black solid; text-align:center;">
+                                Itinerary
+                                Description
+                            </td>
+                            <td style="display:none;"></td>
+                        </tr>
+
+                        <t t-set="seq" t-value="1"/>
+                        <tr t-foreach="sale_order_id.itineraries_expense_ids.sorted(key=lambda a:(a.from_date))"
+                            t-as="Itinerary">
+                            <t t-if="Itinerary.show == True">
+                                <!--                                    <t t-esc="str(sale_order_id.itineraries_expense_ids.from_date) if (sale_order_id.itineraries_expense_ids.from_date is not None) />-->
+                                <td style="border: 1px solid; padding:5px;">
+                                    <span t-esc="seq"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px;">
+                                    <t t-if="Itinerary.from_date">
+                                        <span t-esc="Itinerary.from_date"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </t>
+                                </td>
+                                <td style="border: 1px solid; padding:5px;">
+                                    <t t-if="Itinerary.name">
+                                        <span t-esc="Itinerary.name"/>
+                                    </t>
+                                </td>
+                                <td style="display:none;"></td>
+                                <t t-set="seq" t-value="seq +1"/>
+                            </t>
+                        </tr>
+                    </table>
+
+                    <br/>
+                    <br/>
+
+                    <table style="width:100%" class="table table-sm o_main_table">
+                        <thead>
+                            <tr>
+                                <td colspan="2"
+                                    style="background-color: silver; border: 1px black solid; text-align:center;"></td>
+                                <td colspan="2"
+                                    style="background-color: silver; border: 1px black solid; text-align:center;">
+                                    Adults
+                                </td>
+                                <td colspan="2"
+                                    style="background-color: silver; border: 1px black solid; text-align:center;">
+                                    Children
+                                </td>
+                                <td style="background-color: silver; border: 1px black solid; text-align:center;"></td>
+                                <td style="background-color: silver; border: 1px black solid; text-align:center;"></td>
+
+                            </tr>
+                            <tr rowspan="2" style="background-color: silver; border: 1px solid;">
+                                <td style="border: 1px black solid; text-align:center;">
+                                    #
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Site/Service Name
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    pax
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Price
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    pax
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Price
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Amount
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Notes
+                                </td>
+                            </tr>
+                        </thead>
+                        <t t-set="sum_total" t-value="0"/>
+                        <t t-set="seq" t-value="1"/>
+                        <t t-set="total_amount_entrance" t-value="0"/>
+                        <t t-set="adult_amount_entrance" t-value="0"/>
+                        <t t-set="child_amount_entrance" t-value="0"/>
+
+                        <t t-foreach="sale_order_id.entrance_expense_ids" t-as="entrance">
+                            <t t-if="entrance.show == True">
+
+                                <t t-if="entrance.account_id.id  == object_expenses_sheet_wizard.account_id.id">
+                                    <tr>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="seq"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="entrance.name.name"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc=" float(entrance.adult)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+
+                                            <span t-esc=" float(entrance.adult_cost)"/>
+                                            <t t-set="adult_amount_entrance"
+                                               t-value=" float (entrance.adult * entrance.adult_cost)"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc=" float(entrance.child)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc=" float(entrance.child_cost)"/>
+                                            <t t-set="child_amount_entrance"
+                                               t-value=" float(entrance.child * entrance.child_cost)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-set="total_amount_entrance"
+                                               t-value=" float(adult_amount_entrance + child_amount_entrance)"/>
+                                            <span t-esc="float(total_amount_entrance)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="entrance.note"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                    <t t-set="sum_total" t-value=" float(total_amount_entrance  + sum_total )"/>
+                                </t>
+                            </t>
+                        </t>
+
+                        <t t-set="total_amount_extras" t-value="0"/>
+                        <t t-set="adult_amount_extras" t-value="0"/>
+                        <t t-set="child_amount_extras" t-value="0"/>
+                        <t t-foreach="sale_order_id.extras_expense_ids " t-as="extras">
+                            <t t-if="extras.show == True">
+                                <t t-if="extras.account_id.id  == object_expenses_sheet_wizard.account_id.id">
+                                    <tr>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="seq"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="extras.name.name"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc=" float(extras.adult)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc=" float(extras.adult_rate)"/>
+                                            <t t-set="adult_amount_extras"
+                                               t-value="float(extras.adult * extras.adult_rate)"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="float(extras.child)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="float(extras.child_rate)"/>
+                                            <t t-set="child_amount_extras"
+                                               t-value="float(extras.child * extras.child_rate)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-set="total_amount_extras"
+                                               t-value="float(adult_amount_extras + child_amount_extras)"/>
+                                            <span t-esc="float(total_amount_extras)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="extras.note"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                    <t t-set="sum_total" t-value=" float(total_amount_extras + sum_total)"/>
+                                </t>
+
+
+                            </t>
+                        </t>
+                        <t t-set="total_amount_restaurant" t-value="0"/>
+                        <t t-foreach="sale_order_id.resturnats_expense_ids " t-as="restaurants">
+                            <t t-if="restaurants.show == True">
+
+                                <t t-if="restaurants.account_id.id  == object_expenses_sheet_wizard.account_id.id">
+                                    <tr>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="seq"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="restaurants.name.name"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="float(restaurants.pax)"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+
+                                            <span t-esc="float(restaurants.special_rates)"/>
+
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            0.0
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            0.0
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-set="total_amount_restaurant"
+                                               t-value="float(restaurants.pax * restaurants.special_rates)"/>
+                                            <span t-esc="float(total_amount_restaurant)"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="restaurants.note"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                    <t t-set="sum_total" t-value="float(total_amount_restaurant + sum_total)"/>
+                                </t>
+                            </t>
+                        </t>
+
+                        <t t-set="total_fees_amount_guide" t-value="0"/>
+                        <t t-set="total_overnight_amount_guide" t-value="0"/>
+                        <t t-foreach="sale_order_id.guide_expense_ids " t-as="guide">
+                            <t t-if="guide.show == True">
+                                <t t-if="guide.name.id  == object_expenses_sheet_wizard.account_id.id">
+                                    <tr>
+                                        <t t-if="guide.show_day == True">
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="'Guide Fees (' + guide.name.name+ ')'"/>
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span>0.0</span>
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;">
+
+                                                <span>0.0</span>
+
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                0.0
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                0.0
+                                            </td>
+
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <t t-set="total_fees_amount_guide"
+                                                   t-value="float(guide.days * guide.guide_cost)"/>
+                                                <span t-esc="float(total_fees_amount_guide)"/>
+
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="guide.note"/>
+                                            </td>
+
+                                            <t t-set="sum_total" t-value="float(sum_total + total_fees_amount_guide)"/>
+                                        </t>
+                                    </tr>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                    <tr>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="seq"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="'Guide Overnight (' + guide.name.name + ')'"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span>0.0</span>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+
+                                            <span>0.0</span>
+
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            0.0
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            0.0
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-set="total_overnight_amount_guide"
+                                               t-value="float(guide.overnights * guide.overnight_cost)"/>
+                                            <span t-esc="total_overnight_amount_guide"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="guide.note"/>
+                                        </td>
+                                        <t t-set="sum_total"
+                                           t-value="float(total_overnight_amount_guide +  sum_total )"/>
+                                    </tr>
+                                    <t t-set="seq" t-value="seq +1"/>
+                                </t>
+                            </t>
+                        </t>
+                        <tr>
+                            <td colspan="4"></td>
+                            <td colspan="2" style="border: 1px solid; padding:5px;">Total:</td>
+                            <td style="border: 1px solid; padding:5px;">
+                                <span t-esc="float(sum_total)"/>
+
+                            </td>
+                            <td style="border: 1px solid; padding:5px;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"></td>
+                            <td colspan="2" style="border: 1px solid; padding:5px;">Deposit:</td>
+                            <td style="border: 1px solid; padding:5px;">
+                                <span t-esc="object_expenses_sheet_wizard.deposit"/>
+                            </td>
+                            <td style="border: 1px solid; padding:5px;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"></td>
+                            <td colspan="2" style="border: 1px solid; padding:5px;">Balance Due:</td>
+                            <td style="border: 1px solid; padding:5px;">
+                                <span t-esc="sum_total - object_expenses_sheet_wizard.deposit"/>
+                            </td>
+                            <td style="border: 1px solid; padding:5px;"></td>
+                        </tr>
+                    </table>
+                    <br/>
+
+                    <div class="footer">
+                        <div style="float:left; text-align:center; width:25%; height:280px;">
+                            <p>Management Signature</p>
+                            <br/>
+                            <hr style="height:1px; width:75%; color:gray; margin: auto;"/>
+                        </div>
+                        <div style="float:left; text-align:center;  width:50%; height:280px;">
+                            <p>Guide Signature</p>
+                            <br/>
+                            <hr style="height:1px; width:50%; color:gray; margin: auto;"/>
+                        </div>
+                        <div style="float:right; text-align:center; width:25%; height:280px;">
+                            <p>Accounting Signature</p>
+                            <br/>
+                            <hr style="height:1px; width:75%; color:gray; margin: auto;"/>
+                        </div>
+                    </div>
+
+                </div>
+
+            </t>
+        </t>
+    </template>
+
+
+</odoo>

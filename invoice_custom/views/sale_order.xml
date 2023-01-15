@@ -1,0 +1,1492 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+
+        <record id="open_actual_expense" model="ir.actions.act_window">
+            <field name="name">Actual Expense</field>
+            <field name="res_model">account.move.line</field>
+            <field name="domain">[('sale_order_id','=', active_id)]"</field>
+        </record>
+
+        <record id="view_actual_expense_tree" model="ir.ui.view">
+            <field name="name">account.move.line.tree</field>
+            <field name="model">account.move.line</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="sale_order_id"/>
+                    <field name="name"/>
+                    <field name="debit" sum="Total Debit"/>
+                    <field name="expense_type_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="actual_expense_action_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_actual_expense_tree"/>
+            <field name="act_window_id" ref="open_actual_expense"/>
+        </record>
+
+        <record id="open_estimate_expense" model="ir.actions.act_window">
+            <field name="name">Estimate Expense</field>
+            <field name="res_model">estimate.expense</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('sale_order_id','=', active_id)]"</field>
+            <field name="context">{'default_sale_order_id': active_id}</field>
+        </record>
+
+        <record id="view_estimate_expense_tree" model="ir.ui.view">
+            <field name="name">estimate.expense.tree</field>
+            <field name="model">estimate.expense</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" required="1"/>
+                    <field name="expense_type_id" required="1"/>
+                    <field name="amount" sum="Total Debit" required="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="estimate_expense_action_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_estimate_expense_tree"/>
+            <field name="act_window_id" ref="open_estimate_expense"/>
+        </record>
+
+
+        <record id="sale_order_inherit_auto_done_setting" model="ir.ui.view">
+            <field name="name">sale.order.inherit.view.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_auto_done_setting"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_unlock']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_done']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="sale_order_inherit" model="ir.ui.view">
+            <field name="name">sale.order.inherit.view.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" icon="fa-money" name="invoice_custom.open_actual_expense"
+                            type="action">
+                        <field name="actual_expense_total" string="Actual Cost" widget="statinfo" readonly="1"/>
+                    </button>
+                    <button class="oe_stat_button" icon="fa-money" name="%(open_estimate_expense)d" type="action">
+                        <field name="total_estimate_expense" string="Estimate Cost" widget="statinfo"/>
+                    </button>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="replace"/>
+                <xpath expr="//field[@name='partner_invoice_id']" position="replace"/>
+                <xpath expr="//field[@name='partner_shipping_id']" position="replace"/>
+                <xpath expr="//field[@name='validity_date']" position="replace"/>
+                <xpath expr="//field[@name='date_order']" position="replace"/>
+                <xpath expr="//field[@name='date_order']" position="replace"/>
+                <xpath expr="//field[@name='show_update_pricelist']" position="replace"/>
+                <xpath expr="//field[@name='pricelist_id']" position="replace"/>
+                <xpath expr="//field[@name='payment_term_id']" position="replace"/>
+                <xpath expr="//div[@class='o_td_label']" position="replace"/>
+                <xpath expr="//div[@class='o_td_label']" position="replace"/>
+                <xpath expr="//div[@class='o_row']" position="replace"/>
+                <xpath expr="//label[@for='pricelist_id']" position="replace"/>
+                <xpath expr="//page[@name='order_lines']" position="attributes">
+                    <attribute name="string">Invoice</attribute>
+                </xpath>
+
+                <xpath expr="//page[@name='order_lines']" position="before">
+                    <page string="General Information" name="general_info">
+                        <group name="sale_header">
+                            <group name="partner_details">
+                                <field name="partner_id" string="Agent" widget="res_partner_many2one"
+                                       context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
+                                       options="{&quot;always_reload&quot;: True}"/>
+                                <field name="partner_invoice_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'invoice'}"
+                                       options="{&quot;always_reload&quot;: True}"/>
+                                <field name="partner_shipping_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'delivery'}"
+                                       options="{&quot;always_reload&quot;: True}"/>
+                                <field name="customer" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="arrival_date" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="departure_date" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="file_no" string="Agent ref."
+                                       attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="nationality_id" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="adult_number" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="child_number" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="inf_number" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="total_pax" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                            </group>
+
+                            <group name="order_details">
+                                <field name="validity_date"
+                                       attrs="{'invisible': [('state', 'in', ['sale', 'done'])],'readonly': [('cost_status', '=', 'close')]}"/>
+                                <div class="o_td_label" groups="base.group_no_one"
+                                     attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}">
+                                    <label for="date_order" string="Quotation Date"/>
+                                </div>
+                                <field name="date_order" nolabel="1" groups="base.group_no_one"
+                                       attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])],'readonly': [('cost_status', '=', 'close')]}"/>
+                                <div class="o_td_label" attrs="{'invisible': [('state', 'in', ['draft', 'sent'])]}">
+                                    <label for="date_order" string="Order Date"/>
+                                </div>
+                                <field name="date_order"
+                                       attrs="{'required': [('state', 'in', ['sale', 'done'])], 'invisible': [('state', 'in', ['draft', 'sent'])], 'readonly': [('cost_status', '=', 'close')]}"
+                                       nolabel="1"/>
+                                <field name="show_update_pricelist" invisible="1"
+                                       attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <label for="pricelist_id" groups="product.group_product_pricelist"/>
+                                <div groups="product.group_product_pricelist" class="o_row">
+                                    <field name="pricelist_id" options="{'no_open':True,'no_create': True}"/>
+                                    <button name="update_prices" type="object" string=" Update Prices"
+                                            help="Recompute all prices based on this pricelist"
+                                            class="btn-link mb-1 px-0" icon="fa-refresh"
+                                            confirm="This will update all unit prices based on the currently set pricelist."
+                                            attrs="{'invisible': ['|', ('show_update_pricelist', '=', False), ('state', 'in', ['sale', 'done','cancel'])] , 'readonly': [('cost_status', '=', 'close')]}"/>
+                                </div>
+                                <field name="currency_id" invisible="1"
+                                       attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="payment_term_id" options="{'no_open':True,'no_create': True}"
+                                       attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="other_currency_id"
+                                       attrs='{"readonly":["|",("state","not in",["draft","sent"]),("cost_status", "=", "close")]}'/>
+                                <field name="converging_rate"
+                                       attrs="{'invisible': [('other_currency_id', '=', False)],'readonly':['|',('state','not in',['draft','sent']),('cost_status', '=', 'close')]}"/>
+                                <button name="compute_other_currency" type="object" string="Compute"
+                                        class="oe_highlight"
+                                        attrs="{'invisible': [('other_currency_id', '=', False)], 'readonly':['|',('state','not in',['draft','sent']),('cost_status', '=', 'close')]}"/>
+                                <field name="total_other_currency"
+                                       attrs="{'invisible': [('other_currency_id', '=', False)], 'readonly':['|',('state','not in',['draft','sent']),('cost_status', '=', 'close')]}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="general_note_visibility" string="Appear In Print"
+                                   attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                        </group>
+                        <field name="general_note" placeholder="Genral Note" nolabel="1"
+                               attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                        <field name="additional_note" placeholder="Add. Note" nolabel="1"
+                               attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                    </page>
+                    <page string="Arr/ Dep" name="arr_dep">
+                        <field name="arrival_departure_expense_ids"
+                               attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree context="{'default_sale_order_id': active_id}" default_order="date"
+                                  decoration-info="copy =='copy'" editable="bottom">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name" string="Arr/ Dep"/>
+                                <field name="date"/>
+                                <field name="border"/>
+                                <field name="flight"/>
+                                <field name="hotel_id" domain="[('sale_order_id', '=', sale_order_id)]" invisible="1"/>
+                                <field name="guide_id" invisible="1"/>
+                                <field name="transportation_id" invisible="1"/>
+                                <field name="time" widget="float_time"/>
+                                <field name="str_time" invisible="1"/>
+                                <field name="pax"/>
+                                <field name="meet_by" domain="[('expense_partner_ids.id','=', 10)]"/>
+                                <field name="notes"/>
+                                <field name="copy" invisible="1"/>
+                                <button name="duplicate_action" type="object" class="fa fa-copy"/>
+                            </tree>
+                            <form context="{'default_sale_order_id': active_id}" default_order="date">
+                                <group>
+                                    <group>
+                                        <field name="sale_order_id" invisible="1"/>
+                                        <field name="name" string="Arr/ Dep"/>
+                                        <field name="date"/>
+                                    </group>
+                                    <group>
+                                        <field name="border"/>
+                                        <field name="flight"/>
+                                        <field name="hotel_id" domain="[('sale_order_id', '=', sale_order_id)]"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group>
+                                        <field name="guide_id"/>
+                                        <field name="transportation_id"/>
+                                        <field name="time" widget="float_time"/>
+                                    </group>
+                                    <group>
+                                        <field name="pax"/>
+                                        <field name="meet_by" domain="[('expense_partner_ids.id','=', 10)]"/>
+                                        <field name="notes"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Hotels" name="hotels">
+                        <group>
+                            <group>
+                                <field name="reservation_pax" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                            </group>
+                            <!--                              <group>-->
+                            <!--                                   <field name="remaining_pax"/>                                             -->
+                            <!--                              </group>-->
+                        </group>
+                        <field name="hotels_expense_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree context="{'default_sale_order_id': active_id}" default_order="date_from"
+                                  decoration-info="copy =='copy'">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name" domain="[('expense_partner_ids.id','=', 1)]"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="room_category_id"/>
+                                <field name="meal_id"/>
+                                <field name="pax"/>
+                                <field name="sgl_room"/>
+                                <field name="dbl_room"/>
+                                <field name="trp_room"/>
+                                <field name="twin_room"/>
+                                <field name="oth_room"/>
+                                <field name="copy" invisible="1"/>
+                                <field name="is_created_bill"/>
+                                <button name="duplicate_action" type="object" class="fa fa-copy"/>
+                            </tree>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <field name="show"/>
+                                        <field name="name" required="1" domain="[('expense_partner_ids.id','=', 1)]"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="by_state" invisible="1"/>
+                                            <field name="priority" widget="priority" invisible="1"/>
+                                            <field name="date_from"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="nights"/>
+                                        </group>
+                                        <group>
+                                            <field name="date_to"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="note" attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="additional_note"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+
+                                    </group>
+
+                                    <group>
+
+
+                                        <field name="room_category_id"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="meal_id"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="special_rates"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="status_id"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+
+
+                                    </group>
+
+                                    <group>
+                                        <group>
+                                            <group>
+                                                <field name="per_pax"
+                                                       attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_room','!=',False)]}"/>
+                                            </group>
+                                            <group>
+                                                <field name="per_room"
+                                                       attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_pax','!=',False)]}"/>
+                                            </group>
+
+
+                                        </group>
+
+                                        <group>
+
+                                        </group>
+                                        <label for="per_person" string="P.P"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_pax','=',False)]}"/>
+                                        <field name="per_person"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_pax','=',False)]}"/>
+
+                                        <label for="single_supp" string="SGL.Supp"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_pax','=',False)]}"/>
+                                        <field name="single_supp"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_pax','=',False)]}"/>
+
+                                        <label for="third_person" string="3rd Person"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_pax','=',False)]}"/>
+                                        <field name="third_person"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_pax','=',False)]}"/>
+
+
+                                        <label for="sgl_room_rate" string="SGL"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_room','=',False)]}"/>
+                                        <field name="sgl_room_rate"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_room','=',False)]}"/>
+
+                                        <label for="dbl_room_rate" string="DBL"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_room','=',False)]}"/>
+                                        <field name="dbl_room_rate"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_room','=',False)]}"/>
+
+                                        <label for="trp_room_rate" string="TRP"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_room','=',False)]}"/>
+                                        <field name="trp_room_rate"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)],'invisible': [('per_room','=',False)]}"/>
+                                    </group>
+
+
+                                    <group>
+                                        <group>
+                                            <field name="pax"/>
+                                            <field name="sgl_room"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="dbl_room"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="trp_room"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="twin_room"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <!--     <field name="oth_room"-->
+                                            <!--    attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>-->
+                                        </group>
+                                        <group>
+
+
+                                            <field name="currency_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="sgl_rate"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="dbl_rate"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="trp_rate"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="twin_rate"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="estimated_price" attrs="{'readonly': 1}" force_save="1"/>
+                                            <!--                                                <field name="oth_rate"-->
+                                            <!--                                                       attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>-->
+                                        </group>
+
+
+                                    </group>
+                                    <group string="FOC POLICY">
+                                        <group>
+                                            <field name="foc_sgl"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="foc_dbl"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="foc_trp"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="foc_twin"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+
+                                        </group>
+                                        <group>
+                                            <field name="total_sgl"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="total_dbl"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="total_trp"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="total_twin"
+                                                   attrs="{'readonly': 1}" force_save="1"/>
+                                            <field name="net_estimated_price" attrs="{'readonly': 1}" force_save="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="invoice_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="invoice_date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="expense_type_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="is_created_bill" invisible="1"/>
+                                            <field name="bill_id" invisible="1"/>
+
+                                        </group>
+                                        <group>
+
+                                            <field name="actual_price"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="product_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+
+                                <xpath expr="//div[@id='footer']" position="inside">
+                                    <div id="footer">
+                                        <button id="button_open_reservation_form" style="margin-left: 15px;"
+                                                name="%(invoice_custom.action_hotel_reservation_form_report_wizard)d"
+                                                string="Print Form" type="action"
+                                                class="btn-primary"/>
+
+
+                                        <button style="margin-left: 15px;"
+                                                name="%(invoice_custom.action_hotel_bill_wizard)d"
+                                                string="Create Bill" type="action"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', True)]}"/>
+
+                                        <button id="button_go_to_hotel_bill" style="margin-left: 15px;"
+                                                name="button_go_to_hotel_bill"
+                                                string="View Bill" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', False)]}"/>
+
+                                        <field name="is_received_invoice" style="margin-left: 150px;" invisible="1"/>
+
+                                        <button id="button_open_hotel" style="margin-left: 15px;"
+                                                name="button_open_hotel"
+                                                string="Unlock" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', False)]}"
+                                                groups="invoice_custom.group_account_user"/>
+
+                                        <button id="button_close_hotel" style="margin-left: 15px;"
+                                                name="button_close_hotel"
+                                                string="Lock" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', True)]}"
+                                                groups="invoice_custom.group_account_user"/>
+                                    </div>
+
+
+                                </xpath>
+
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Program / Itinerary" name="program_itinerary">
+                        <field name="itineraries_expense_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree context="{'default_sale_order_id': active_id} "
+                                  default_order="from_date" editable="bottom">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="from_date"/>
+                                <field name="days"/>
+                                <field name="name"/>
+                                <field name="type_service_id"/>
+                                <field name="guide_name_id" domain="[('expense_partner_ids.id','in', (4,10))]"/>
+                            </tree>
+                            <form context="{'default_sale_order_id': active_id}">
+                                <group>
+                                    <group>
+                                        <field name="sale_order_id" invisible="1"/>
+                                        <field name="from_date"/>
+
+                                        <field name="name"/>
+                                    </group>
+                                    <group>
+                                        <field name="type_service_id"/>
+                                        <field name="guide_name_id"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Restaurants" name="restaurants">
+                        <field name="resturnats_expense_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree context="{'default_sale_order_id': active_id}" default_order="date"
+                                  decoration-info="copy =='copy'">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name" domain="[('expense_partner_ids.id','=', 6)]"/>
+                                <field name="date"/>
+                                <field name="pax"/>
+                                <field name="meal_id"/>
+                                <field name="account_id"/>
+                                <field name="note"/>
+                                <field name="special_rates"/>
+                                <field name="estimated_price"/>
+                                <field name="actual_price"/>
+                                <field name="is_created_bill"/>
+                                <field name="copy" invisible="1"/>
+                                <field name="guide_ids" invisible="1"/>
+                                <button name="duplicate_action" type="object" class="fa fa-copy"/>
+                            </tree>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <group>
+                                            <field name="show"/>
+                                            <field name="guide_ids" invisible="1"/>
+                                            <field name="name" domain="[('expense_partner_ids.id','=', 6)]" required="1"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+
+
+                                        <group>
+                                            <field name="date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+
+                                        <group>
+                                            <field name="guide_or_transportation"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="account_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   options="{'no_create': True}"
+                                            />
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="guide_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   invisible="1"/>
+                                            <field name="guide_id2" domain="[('expense_partner_ids.id','=', 6)]"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   invisible="1"/>
+
+                                            <!--                                            <field name="guide_id" domain="[('expense_partner_ids.id','=', 4)]"-->
+                                            <!--                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>-->
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="note" attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="additional_note"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="meal_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="pax"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                        <group>
+
+                                            <field name="currency_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="special_rates"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="status_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                    <group>
+
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="invoice_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="invoice_date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="expense_type_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                            <field name="is_created_bill" invisible="1"/>
+                                            <field name="bill_id" invisible="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="estimated_price" readonly="1" force_save="1"/>
+                                            <field name="actual_price"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="product_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+                                <xpath expr="//div[@id='restaurant']" position="inside">
+                                    <div id="restaurant">
+                                        <button id="button_restaurant_open_reservation_form" style="margin-left: 15px;"
+                                                name="%(invoice_custom.action_restaurant_reservation_form_report_wizard)d"
+                                                string="Print Form" type="action"
+                                                class="btn-primary"/>
+
+                                        <button id="button_create_restaurant_bill" style="margin-left: 15px;"
+                                                name="button_create_restaurant_bill"
+                                                string="Create Bill" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', True)]}"/>
+
+                                        <button id="button_go_to_restaurant_bill" style="margin-left: 15px;"
+                                                name="button_go_to_restaurant_bill"
+                                                string="View Bill" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', False)]}"/>
+
+                                        <field name="is_received_invoice" style="margin-left: 150px;" invisible="1"/>
+
+                                        <button id="button_open_restaurant" style="margin-left: 15px;"
+                                                name="button_open_restaurant"
+                                                string="Unlock" type="object"
+
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', False)]}"
+                                                groups="invoice_custom.group_account_user"/>
+
+                                        <button id="button_close_restaurant" style="margin-left: 15px;"
+                                                name="button_close_restaurant"
+                                                string="Lock" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', True)]}"
+                                                groups="invoice_custom.group_account_user"/>
+                                    </div>
+                                </xpath>
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Transportation" name="transportation">
+                        <field name="transportation_expense_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree context="{'default_sale_order_id': active_id}" default_order="date_from"
+                                  decoration-info="copy == 'copy'">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name" domain="[('expense_partner_ids.id','=', 2)]"/>
+                                <field name="driver_name"/>
+                                <field name="driver_number"/>
+                                <!--                                <field name="palte_number"/>-->
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="vehicles_id"/>
+                                <field name="pax"/>
+                                <field name="note"/>
+                                <!--                                <field name="special_rates"/>-->
+                                <!--                                <field name="estimated_price"/>-->
+                                <!--                                <field name="actual_price"/>-->
+                                <field name="copy" invisible="1"/>
+                                <field name="is_created_bill"/>
+                                <button name="duplicate_action" type="object" class="fa fa-copy"/>
+                            </tree>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <group>
+                                            <field name="show"/>
+                                            <field name="name" required="1" domain="[('expense_partner_ids.id','=', 2)]"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="driver_name"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+
+                                            <field name="driver_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+
+                                            <field name="palte_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                        <group>
+                                            <field name="date_from"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="date_to"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="note" attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="additional_note"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="vehicles_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="pax"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                        <group>
+
+                                            <field name="currency_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="special_rates"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="status_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="is_received_invoice" invisible="1"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="invoice_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="invoice_date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="expense_type_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="estimated_price"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="actual_price"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="product_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+                                <xpath expr="//div[@id='transportation_footer']" position="inside">
+                                    <div id="transportation_footer">
+                                        <button id="button_open_transportation_reservation_form"
+                                                style="margin-left: 15px;"
+                                                name="%(invoice_custom.action_transportation_reservation_form_report_wizard)d"
+                                                string="Print Form" type="action"
+                                                class="btn-primary"/>
+
+
+                                        <button style="margin-left: 15px;"
+                                                name="%(action_transportation_bill_wizard)d"
+                                                string="Create Bill" type="action"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', True)]}"/>
+
+                                        <button id="button_go_to_transportation_bill" style="margin-left: 15px;"
+                                                name="button_go_to_transportation_bill"
+                                                string="View Bill" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', False)]}"/>
+
+                                        <field name="is_received_invoice" style="margin-left: 150px;" invisible="1"/>
+                                        <field name="is_created_bill" style="margin-left: 150px;" invisible="1"/>
+
+                                        <button id="button_open_transportation" style="margin-left: 15px;"
+                                                name="button_open_transportation"
+                                                string="Unlock" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', False)]}"
+                                                groups="invoice_custom.group_account_user"/>
+
+                                        <button id="button_close_transportation" style="margin-left: 15px;"
+                                                name="button_close_transportation"
+                                                string="Lock" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', True)]}"
+                                                groups="invoice_custom.group_account_user"/>
+
+
+                                    </div>
+                                </xpath>
+                                <!--                                <xpath expr="//div[@id='footer']" position="inside">-->
+                                <!--                                    <div id="footer">-->
+
+
+                                <!--                                    </div>-->
+                                <!--                                </xpath>-->
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Guide" name="guide">
+                        <field name="guide_expense_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree context="{'default_sale_order_id': active_id}" decoration-info="copy == 'copy'"
+                                  default_order="date_from">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name" domain="[('expense_partner_ids.id','=', 4)]"/>
+                                <field name="guide_number"/>
+                                <field name="language_id"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="note"/>
+                                <field name="special_rates"/>
+                                <field name="estimated_price"/>
+                                <field name="actual_price"/>
+                                <field name="is_created_bill"/>
+                                <field name="copy" invisible="1"/>
+                                <button name="duplicate_action" type="object" class="fa fa-copy"/>
+                            </tree>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <field name="show"/>
+                                        <field name="name" required="1" domain="[('expense_partner_ids.id','=', 4)]"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="guide_number"/>
+                                            <!--                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>-->
+                                            <field name="date_from"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+
+
+                                            <field name="status_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+
+                                        <group>
+                                            <field name="language_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="date_to"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+
+
+                                        </group>
+                                    </group>
+                                    <group>
+
+                                        <group>
+                                            <field name="days"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="show_day"/>
+                                            <field name="overnights"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                        <group>
+                                            <field name="guide_cost"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="overnight_cost"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                    <group>
+
+                                        <field name="guide_total"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="overnight_total"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+
+                                    <group>
+                                        <field name="note" attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="additional_note"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="is_received_invoice"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                               invisible="1"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="invoice_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="invoice_date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="expense_type_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   force_save="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="estimated_price" readonly="1" force_save="1"/>
+                                            <field name="actual_price"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="product_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+
+                                <xpath expr="//div[@id='footer']" position="inside">
+                                    <div id="footer">
+
+
+                                        <button id="button_create_guide_bill" style="margin-left: 15px;"
+                                                name="button_create_guide_bill"
+                                                string="Create Bill" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', True)]}"/>
+
+                                        <button id="button_go_to_guide_bill" style="margin-left: 15px;"
+                                                name="button_go_to_guide_bill"
+                                                string="View Bill" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_created_bill', '=', False)]}"/>
+
+                                        <field name="is_received_invoice" style="margin-left: 150px;" invisible="1"/>
+                                        <field name="is_created_bill" style="margin-left: 150px;" invisible="1"/>
+
+                                        <button id="button_open_guide" style="margin-left: 15px;"
+                                                name="button_open_guide"
+                                                string="Unlock" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', False)]}"
+                                                groups="invoice_custom.group_account_user"/>
+
+                                        <button id="button_close_guide" style="margin-left: 15px;"
+                                                name="button_close_guide"
+                                                string="Lock" type="object"
+                                                class="btn-primary"
+                                                attrs="{'invisible':[('is_received_invoice', '=', True)]}"
+                                                groups="invoice_custom.group_account_user"/>
+                                    </div>
+
+
+                                </xpath>
+
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Clients" name="clients">
+                        <h3>Rooming List</h3>
+                        <group>
+                            <field name="excel_file" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                        </group>
+                        <group>
+                            <button name="import_from_excel" class="btn btn-primary" type="object"
+                                    string="Import From File"
+                                    attrs="{'invisible': [('excel_file', '=', False)],'readonly':[('cost_status', '=', 'close')]}"/>
+
+
+                        </group>
+                        <group>
+                            <group>
+                                <field name="age"/>
+                                <field name="room_type_id"/>
+                                <field name="rn"/>
+                            </group>
+                        </group>
+                        <button name="select_all_rooming_list" class="btn btn-primary" type="object"
+                                string="Select All" attrs="{'readonly': [('cost_status', '=', 'close')]}"
+                                style="margin-right:20px;"/>
+
+                        <button name="un_select_all_rooming_list" class="btn btn-primary" type="object"
+                                string="Un_Select All" attrs="{'readonly': [('cost_status', '=', 'close')]}"
+                                style="margin-right:20px;"/>
+
+                        <button name="delete_selected_rooming_list" class="btn btn-primary" type="object"
+                                string="Delete Selected" attrs="{'readonly': [('cost_status', '=', 'close')]}"
+                                style="margin-right:20px;"/>
+
+                        <button name="get_from_manifest" class="btn btn-primary" type="object"
+                                string="Get From Manifest" attrs="{'readonly': [('cost_status', '=', 'close')]}"
+                                style="margin-right:20px;"/>
+
+
+                        <button name="change_selected" class="btn btn-primary" type="object"
+                                string="Change Selected" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+
+                        <field name="clients_expense_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree editable="bottom" context="{'default_sale_order_id': active_id}">
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="select"/>
+                                <field name="show"/>
+                                <field name="name"/>
+                                <field name="age"/>
+                                <field name="room_type_id"/>
+                                <field name="rn"/>
+                                <field name="note"/>
+                            </tree>
+                        </field>
+                        <h3>Manifest</h3>
+                        <group>
+                            <field name="manifest_excel_file" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                        </group>
+                        <group>
+                            <button name="import_manifest_from_excel" class="btn btn-primary" type="object"
+                                    string="Import From File"
+                                    attrs="{'invisible': [('manifest_excel_file', '=', False)],'readonly':[('cost_status', '=', 'close')]}"/>
+                        </group>
+
+                        <button name="select_all_manifest" class="btn btn-primary" type="object"
+                                string="Select All" attrs="{'readonly': [('cost_status', '=', 'close')]}"
+                                style="margin-right:20px;"/>
+
+                        <button name="un_select_all_manifest" class="btn btn-primary" type="object"
+                                string="Un_Select All" attrs="{'readonly': [('cost_status', '=', 'close')]}"
+                                style="margin-right:20px;"/>
+
+                        <button name="delete_selected_manifest" class="btn btn-primary" type="object"
+                                string="Delete Selected" attrs="{'readonly': [('cost_status', '=', 'close')]}"
+                                style="margin-right:20px;"/>
+
+
+                        <button name="get_from_rooming_list" class="btn btn-primary" type="object"
+                                string="Get From Rooming List" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+
+
+                        <field name="clients_passport_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree editable="bottom" context="{'default_sale_order_id': active_id}">
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="select"/>
+                                <field name="show"/>
+                                <field name="name"/>
+                                <field name="passport_number"/>
+                                <field name="birth_date"/>
+                                <field name="issue_date"/>
+                                <field name="expiry_date"/>
+                                <field name="nationality_id"/>
+                                <!--                                <field name="note"/>-->
+                            </tree>
+                        </field>
+
+                        <group>
+                            <field name="delegate_name"/>
+                            <field name="delegate_number"/>
+                            <field name="guide_id" domain="[('expense_partner_ids.id','=', 4)]"/>
+                            <field name="transportation_id" domain="[('sale_order_id','=', id)]"/>
+
+                        </group>
+
+                        <field name="details_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree editable="bottom" context="{'default_sale_order_id': active_id}">
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="date"/>
+                                <field name="details"/>
+                            </tree>
+                        </field>
+
+                    </page>
+                    <page string="Entrance" name="entrance">
+                        <field name="entrance_expense_ids"
+                               context="{'default_adult': adult_number, 'default_child': child_number, 'default_sale_order_id': active_id}"
+                               attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree widget="one2many" default_order="date"
+                                  decoration-info="copy =='copy'">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name"/>
+                                <field name="date"/>
+                                <field name="adult"/>
+                                <field name="adult_cost"/>
+                                <field name="child"/>
+                                <field name="child_cost"/>
+                                <field name="total" sum='Total'/>
+                                <field name="note"/>
+                                <field name="copy" invisible="1"/>
+                                <button name="duplicate_action" type="object" class="fa fa-copy"/>
+                            </tree>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <field name="sale_order_id" invisible="1"/>
+                                        <field name="show"/>
+                                        <field name="name" required="1"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+
+
+                                    <group>
+                                        <field name="guide_or_transportation"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="account_id"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                               options="{'no_create': True}"
+                                        />
+                                    </group>
+
+
+                                    <group>
+                                        <group>
+                                            <field name="date" required="1"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="rate" readonly="1"/>
+                                            <button name="cheke_availability" class="btn btn-primary" type="object"
+                                                    string="Cheke Availability"/>
+                                            <field name="cheke_availability_note" readonly="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="currency_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="number_of_jeep"
+                                                   />
+                                            <field name="adult"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="adult_cost"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="child"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="child_cost"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="total" force_save="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="note" attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="is_received_invoice" invisible="1"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="invoice_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="invoice_date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                        <group>
+                                            <field name="estimated_price" readonly="1" force_save="1"/>
+                                            <field name="actual_price"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+
+
+                                <field name="is_received_invoice" style="margin-left: 150px;" invisible="1"/>
+
+                                <button id="button_open_entrance" style="margin-left: 15px;"
+                                        name="button_open_entrance"
+                                        string="Unlock" type="object"
+                                        class="btn-primary"
+                                        attrs="{'invisible':[('is_received_invoice', '=', False)]}"
+                                        groups="invoice_custom.group_account_user"/>
+
+                                <button id="button_close_entrance" style="margin-left: 15px;"
+                                        name="button_close_entrance"
+                                        string="Lock" type="object"
+                                        class="btn-primary"
+                                        attrs="{'invisible':[('is_received_invoice', '=', True)]}"
+                                        groups="invoice_custom.group_account_user"/>
+
+
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Extras" name="extras">
+                        <field name="extras_expense_ids"
+                               context="{'default_adult': adult_number, 'default_child': child_number, 'default_sale_order_id': active_id}"
+                               attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree default_order="date"
+                                  decoration-info="copy == 'copy'">
+                                <field name="show"/>
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name"/>
+                                <field name="supplier_id"/>
+                                <field name="date"/>
+                                <field name="adult"/>
+                                <field name="adult_rate"/>
+                                <field name="child"/>
+                                <field name="child_rate"/>
+                                <field name="total" sum="total"/>
+                                <field name="note"/>
+                                <field name="copy" invisible="1"/>
+                                <field name="is_created_bill"/>
+                                <button name="duplicate_action" type="object" class="fa fa-copy"/>
+                            </tree>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <field name="show"/>
+                                        <field name="name" required="1"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        <field name="supplier_id" required="1"
+                                               attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="guide_or_transportation"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="account_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"
+                                                   options="{'no_create': True}"
+                                            />
+                                        </group>
+                                        <group>
+                                            <field name="date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+
+                                        <group>
+
+                                            <field name="currency_id"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="adult"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="adult_rate"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="child"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="child_rate"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="total" force_save="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="note" attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="is_received_invoice" invisible="1"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="invoice_number"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="invoice_date"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                            <field name="is_created_bill" invisible="1"/>
+                                            <field name="bill_id" invisible="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="estimated_price" readonly="1" force_save="1"/>
+                                            <field name="actual_price"
+                                                   attrs="{'readonly': [('is_received_invoice', '=', True)]}"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+
+
+                                <button id="button_create_extras_bill" style="margin-left: 15px;"
+                                        name="button_create_extras_bill"
+                                        string="Create Bill" type="object"
+                                        class="btn-primary"
+                                        attrs="{'invisible':[('is_created_bill', '=', True)]}"/>
+
+                                <button id="button_go_to_extras_bill" style="margin-left: 15px;"
+                                        name="button_go_to_extras_bill"
+                                        string="View Bill" type="object"
+                                        class="btn-primary"
+                                        attrs="{'invisible':[('is_created_bill', '=', False)]}"/>
+
+
+                                <field name="is_received_invoice" style="margin-left: 150px;" invisible="1"/>
+
+                                <button id="button_open_extras" style="margin-left: 15px;"
+                                        name="button_open_extras"
+                                        string="Unlock" type="object"
+                                        class="btn-primary"
+                                        attrs="{'invisible':[('is_received_invoice', '=', False)]}"
+                                        groups="invoice_custom.group_account_user"/>
+
+                                <button id="button_close_extras" style="margin-left: 15px;"
+                                        name="button_close_extras"
+                                        string="Lock" type="object"
+                                        class="btn-primary"
+                                        attrs="{'invisible':[('is_received_invoice', '=', True)]}"
+                                        groups="invoice_custom.group_account_user"/>
+
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Inclusions" name="Inclusions">
+                        <field name="inclusions_expense_ids" attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree editable="bottom" context="{'default_sale_order_id': active_id}">
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name"/>
+                                <field name="inclusion_id"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <!--                    <page string="Estimate Cost" name="estimate_expense">-->
+                    <!--                        <field name="estimate_expense_ids">-->
+                    <!--                            <tree string="Estimate Cost"-->
+                    <!--                                  context="{'default_sale_order_id': active_id}">-->
+                    <!--                                <field name="sale_order_id" invisible="1"/>-->
+                    <!--                                <field name="expense_type_id"/>-->
+                    <!--                                <field name="name" string="Description"/>-->
+                    <!--                                <field name="vendor_id" domain="[('expense_partner_ids.id','=', expense_type_id)]"/>-->
+                    <!--                                <field name="unit_cost"/>-->
+                    <!--                                <field name="pax"/>-->
+                    <!--                                <field name="currency_id"/>-->
+                    <!--                                <field name="currency_rate"/>-->
+                    <!--                                <field name="amount" sum="Total" string="Total"/>-->
+                    <!--                                <field name="total_other_currency" sum="Total" string="Total"/>-->
+                    <!--                            </tree>-->
+                    <!--                            <form context="{'default_sale_order_id': active_id}">-->
+                    <!--                                <group>-->
+                    <!--                                    <group>-->
+                    <!--                                        <field name="sale_order_id" invisible="1"/>-->
+                    <!--                                        <field name="expense_type_id"/>-->
+                    <!--                                        <field name="name" string="Description"/>-->
+                    <!--                                    </group>-->
+                    <!--                                    <group>-->
+                    <!--                                        <field name="vendor_id"-->
+                    <!--                                               domain="[('expense_partner_ids.id','=', expense_type_id)]"/>-->
+                    <!--                                        <field name="unit_cost"/>-->
+                    <!--                                    </group>-->
+                    <!--                                </group>-->
+                    <!--                                <group>-->
+                    <!--                                    <group>-->
+
+                    <!--                                        <field name="pax"/>-->
+                    <!--                                        <field name="currency_id"/>-->
+                    <!--                                        <field name="currency_rate"/>-->
+
+                    <!--                                    </group>-->
+                    <!--                                    <group>-->
+                    <!--                                        <field name="amount" sum="Total" string="Total"/>-->
+                    <!--                                        <field name="total_other_currency" sum="Total" string="Total"/>-->
+                    <!--                                    </group>-->
+                    <!--                                </group>-->
+                    <!--                            </form>-->
+                    <!--                        </field>-->
+                    <!--                    </page>-->
+                    <page string="Actual Cost" name="actual_expense">
+                        <field name="cost_status" widget="statusbar" invisible="1"
+                               attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                        <button name="change_cost_status" class="btn btn-primary" type="object" string="Close Cost"
+                                attrs="{'invisible': [('cost_status', '=', 'close')]}"
+                                groups="invoice_custom.group_account_user"/>
+                        <button name="change_cost_status" class="btn btn-primary" type="object" string="Open Cost"
+                                attrs="{'invisible': [('cost_status', '=', 'pending')]}"
+                                groups="invoice_custom.group_account_user"/>
+                        <field name="actual_expense_ids" readonly="1"
+                               attrs="{'readonly': [('cost_status', '=', 'close')]}">
+                            <tree string="Actual Cost" editable="bottom">
+                                <field name="sale_order_id" invisible="1"/>
+                                <field name="name" string="Description"/>
+                                <!--                                <field name="move_id" string="Journal Entry"/>-->
+                                <field name="expense_type_id"/>
+                                <field name="debit" sum="Total Debit" string="Amount"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Profit/loss">
+                        <group>
+                            <group>
+                                <button name="calculate_profit_loss" class="btn btn-primary" type="object"
+                                        string="Calculate"/>
+                            </group>
+                            <group>
+                                <field name="last_calculated_time" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="invoiced_amount" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="actual_expense_total" string="Cost"
+                                       attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                            </group>
+                            <group>
+                                <field name="profit_loss" attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                                <field name="net_profit_margin" widget="percentage"
+                                       attrs="{'readonly': [('cost_status', '=', 'close')]}"/>
+                            </group>
+                        </group>
+
+
+                        <group string="Revenue">
+                            <field name="revenue_ids" readonly="1">
+                                <tree>
+                                    <field name="label"/>
+                                    <field name="amount" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group string="Cost">
+                            <field name="actual_expense_ids" readonly="1">
+                                <tree editable="bottom">
+                                    <field name="sale_order_id" invisible="1"/>
+                                    <field name="name" string="Description"/>
+                                    <field name="move_id" string="Invoice Number"/>
+                                    <field name="expense_type_id"/>
+                                    <field name="debit" sum="Total Debit" string="Amount"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="sale_order_inherit_tree" model="ir.ui.view">
+            <field name="name">sale.order.inherit.tree</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                    <attribute name="string">Agent</attribute>
+                </field>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="customer"/>
+                    <field name="arrival_date"/>
+                    <field name="departure_date"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- <record id="sale_order_search_view_inherit" model="ir.ui.view">
+             <field name="name">sale.order.inherit.view.search</field>
+             <field name="model">sale.order</field>
+             <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+             <field name="arch" type="xml">
+               <xpath expr="//search" position="inside">
+                  <field name="customer" string="Customer"/>
+                  <field name="partner_id" string="Agent"/>
+                </xpath>
+             </field>
+        </record> -->
+
+        <record id="quotation_tree_view_inherit" model="ir.ui.view">
+            <field name="name">sale.order.inherit.view.list</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                    <attribute name="string">Agent</attribute>
+                </field>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="customer"/>
+                    <field name="arrival_date"/>
+                    <field name="departure_date"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_partner_custom_inherit" model="ir.ui.view">
+            <field name="name">res.partner.inherit.view.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='function']" position="after">
+                    <field name="language_ids" widget="many2many_tags"
+                           attrs="{'invisible': [('expense_partner_ids','not in', [4])]}"/>
+                </xpath>
+                <xpath expr="//field[@name='company_type']" position="before">
+                    <div class="o_row">
+                        <h1>
+                            <field name="priority" class="oe_inline" nolabel="1" widget="priority"
+                                   attrs="{'invisible': [('expense_partner_ids','not in', [1])]}"/>
+                        </h1>
+                        <br/>
+                    </div>
+                </xpath>
+
+
+                <field name="category_id" position="after">
+                    <field name="expense_partner_ids" widget="many2many_tags" options="{'no_create_edit': True}"
+                           placeholder="Expense Type..."/>
+                </field>
+                <page name="internal_notes" position="after">
+                    <page name="estimate_expense" string="Estimate Payment">
+                        <field name="estimate_expense_ids">
+                            <tree string="Estimate Cost" readonly="1" editable="bottom"
+                                  context="{'default_sale_order_id': active_id}">
+                                <field name="expense_type_id"/>
+                                <field name="name" string="Description"/>
+                                <field name="sale_order_id"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="unit_cost"/>
+                                <field name="pax"/>
+                                <field name="amount" sum="Total" string="Total"/>
+                            </tree>
+                        </field>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+        <record id="view_quotation_tree_inherit" model="ir.ui.view">
+            <field name="name">view.quotation.tree.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="inside">
+                    <header>
+                        <button name="action_calculate_all_profit_loss" string="Calculate ALL profit And Loss"
+                                type="object" class="oe_highlight"/>
+                    </header>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

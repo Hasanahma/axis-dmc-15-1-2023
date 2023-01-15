@@ -1,0 +1,407 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+ <record id="action_hotel_reservation_form_report" model="ir.actions.report">
+            <field name="name">hotel reservation form report</field>
+            <field name="model">hotel.reservation.form.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">invoice_custom.hotel_reservation_form_report_view</field>
+            <field name="report_file">invoice_custom.hotel_reservation_form_report_view</field>
+            <field name="print_report_name">(object.name_of_hotel)</field>
+            <field name="binding_model_id" ref="model_hotel_reservation_form_report_wizard"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="hotel_reservation_form_report_view">
+
+        <t t-call="web.html_container">
+                <t t-call="web.external_layout" style="background:unset">
+
+
+                    <div class="page">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+
+                        </style>
+                        <t t-if="object_hotel_reservation_form_report_wizard.show_reservation">
+                            <h4 style="text-align:center">HOTEL RESERVATION FORM</h4>
+                        </t>
+                        <t t-if="object_hotel_reservation_form_report_wizard.show_voucher">
+                            <h4 style="text-align:center">HOTEL VOUCHER</h4>
+                        </t>
+
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="border-right: none;">
+                                        <b>To:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="hotels_id.name"/>
+                                    </td>
+                                    <td style="border-right: none;">
+                                        <b>File No:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="sale_order_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <t t-if="object_hotel_reservation_form_report_wizard.show_reservation">
+                                        <td style="border-right: none;">
+                                            <b>Att:</b>
+                                        </td>
+                                        <td>
+                                            <span style="margin-left:50px;">Reservation Department</span>
+                                        </td>
+                                    </t>
+
+                                    <t t-if="object_hotel_reservation_form_report_wizard.show_voucher">
+                                        <td style="border-right: none;">
+                                            <b>Att:</b>
+                                        </td>
+                                        <td>
+                                            <span style="margin-left:50px;">Voucher Department</span>
+                                        </td>
+                                    </t>
+
+                                    <td style="border-right: none;">
+                                        <b>Tel:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="hotels_id.phone"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-right: none;">
+                                        <b>From:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="user.name"/>
+                                    </td>
+                                    <td style="border-right: none;">
+                                        <b>Email:</b>
+                                    </td>
+                                    <td>
+                                        <span style="margin-left:50px;" t-esc="hotels_id.email"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-right: none;">
+                                        <b>Date:</b>
+
+                                    </td>
+                                    <td colspan="3">
+                                        <span style="margin-left:50px;"
+                                              t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <p style="text-align:left">
+                            <u>Kindly book and confirm the following reservation</u>
+                        </p>
+                        <table style="border:none;">
+                            <tr>
+                                <td style="width:10%; border-right:none;">
+                                    <b>Group Name:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 50%; border-right:none; background-color: #ffffff;">
+                                    <span t-esc="sale_order_id.customer"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:10%; border-right:none;">
+                                    <b>Nationality:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 50%; border-right:none; background-color: #ffffff;">
+                                    <span t-esc="sale_order_id.nationality_id.name"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!--selected_hotels.get('hotel_ids')-->
+                        <br/>
+                        <t t-if="object_hotel_reservation_form_report_wizard.hotel_ids">
+                            <h4 style="text-align:center">Room Requirement</h4>
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check In
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check Out
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Meal
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Pax
+                                        </td>
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Room Type
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Sgl
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Dbl
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Trp
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Twin
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="seq" t-value="1"/>
+
+                                <tr t-foreach="object_hotel_reservation_form_report_wizard.hotel_ids" t-as="h">
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="seq"/>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.date_from">
+                                            <span t-esc="h.date_from"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.date_to">
+                                            <span t-esc="h.date_to"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </t>
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.meal_id.name">
+                                            <span t-esc="h.meal_id.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.pax">
+                                            <span t-esc="h.pax"/>
+                                        </t>
+                                        <t t-if="not h.pax">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.room_category_id">
+                                            <span t-esc="h.room_category_id.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.sgl_room">
+                                            <span t-esc="h.sgl_room"/>
+                                        </t>
+                                        <t t-if="not h.sgl_room">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.dbl_room">
+                                            <span t-esc="h.dbl_room"/>
+                                        </t>
+                                        <t t-if="not h.dbl_room">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.trp_room">
+                                            <span t-esc="h.trp_room"/>
+                                        </t>
+                                        <t t-if="not h.trp_room">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        <t t-if="h.twin_room">
+                                            <span t-esc="h.twin_room"/>
+                                        </t>
+                                        <t t-if="not h.twin_room">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td style="display:none;">
+
+                                    </td>
+                                    <t t-set="seq" t-value="seq +1"/>
+
+                                </tr>
+                            </table>
+                        </t>
+                        <br/>
+                        <t t-if="object_hotel_reservation_form_report_wizard.show_note">
+                            <div style="width:100%">
+                                <div style="float:left; text-align:left">
+                                    <strong style="margin-right:50px;">Notes:</strong>
+                                </div>
+                                <!--                                <div style="width:90%; float:right; border:1px solid black; height: 20px;">-->
+                                <div style="float:left;">
+                                    <tr t-foreach="object_hotel_reservation_form_report_wizard.hotel_ids" t-as="h">
+
+                                        <span t-esc="h.note"/>
+                                        <br/>
+                                    </tr>
+                                    <!--                                </div>-->
+                                </div>
+                            </div>
+                        </t>
+                        <br/>
+                        <br/>
+                        <t t-if="object_hotel_reservation_form_report_wizard.show_add_note">
+                            <div style="width:100%">
+                                <div style="float:left; text-align:left">
+                                    <strong style="margin-right:50px;">Add. Notes:</strong>
+                                </div>
+                                <!--                                <div style="width:90%; float:right; border:1px solid black; height: 20px;">-->
+                                <div style="float:left;">
+                                    <tr t-foreach="object_hotel_reservation_form_report_wizard.hotel_ids" t-as="h">
+
+                                        <span t-esc="h.additional_note"/>
+                                        <br/>
+                                    </tr>
+                                    <!--                                </div>-->
+                                </div>
+                            </div>
+                        </t>
+                        <br/>
+                        <br/>
+
+                        <t t-if="object_hotel_reservation_form_report_wizard.show_client">
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            client name
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Room type
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            comment
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+                                </thead>
+
+                                <t t-foreach="sorted(rooms_list, key=lambda d: d['number'])" t-as="room">
+<!--                                        <tr t-foreach="sorted(rooms_list, key=lambda d: d['number'])" t-as="line">-->
+                                    <tr>
+<!--                                        <td><span t-esc="room['show']"/></td>-->
+                                        <td t-att-rowspan="room['len_of_clients']"
+                                            style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="room['number']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;"
+                                            t-esc="room['clients'][0]['name']" >
+
+                                        </td>
+
+                                        <td t-att-rowspan="room['len_of_clients']"
+                                            style="border: 1px solid; padding:5px;">
+                                            <t t-if="room['type']">
+                                                <span t-esc="room['type']"/>
+                                            </t>
+                                        </td>
+
+                                        <td style="border: 1px solid;padding:5px;">
+                                            <span t-esc="room['clients'][0]['comment']"/>
+                                        </td>
+
+                                        <td style="display:none;"></td>
+                                    </tr>
+
+                                    <t t-if="room['clients']" t-foreach="room['clients'][1:]" t-as="client">
+
+                                        <tr>
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <t t-if="client['name']">
+                                                    <span t-esc="client['name']"/>
+                                                </t>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <t t-if="client['comment']">
+                                                    <span t-esc="client['comment']"
+                                                    />
+                                                </t>
+                                            </td>
+
+                                            <td style="display:none;"></td>
+
+                                        </tr>
+
+                                    </t>
+
+
+                                </t>
+                            </table>
+                        </t>
+                        <br/>
+                        <t t-if="object_hotel_reservation_form_report_wizard.show_client">
+                            <table style="width:100%">
+                                <thead>
+                                    <td style="border: 1px black solid; text-align:center;">SGL</td>
+                                    <td style="border: 1px black solid; text-align:center;">DBL</td>
+                                    <td style="border: 1px black solid; text-align:center;">TWN</td>
+                                    <td style="border: 1px black solid; text-align:center;">TRP</td>
+                                    <td style="border: 1px black solid; text-align:center;">TOTAL Rooms</td>
+                                </thead>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="counter_sgl"/>
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="counter_dbl"/>
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="counter_twn"/>
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="counter_trp"/>
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="counter_total"/>
+                                </td>
+                            </table>
+                        </t>
+                        <br/>
+                        <p style="text-align:left">
+                            I look forward to receiving your reply by return fax or email, and I thank you for your
+                            attention
+                        </p>
+
+
+                    </div>
+                </t>
+            </t>
+
+
+        </template>
+    </data>
+</odoo>

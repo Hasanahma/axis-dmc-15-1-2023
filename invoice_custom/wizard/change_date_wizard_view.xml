@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="change_date_wizard_view" model="ir.ui.view">
+        <field name="name">Change Date</field>
+        <field name="model">change.date.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="new_date"/>
+                </group>
+
+                <footer>
+                    <button
+                            name="button_change_date"
+                            string="Change"
+                            type="object"
+                            default_focus="1"
+                            class="oe_highlight"
+                    />
+
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_change_date_wizard" model="ir.actions.act_window">
+        <field name="name">Change Date</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">change.date.wizard</field>
+        <field name="domain">[]</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="change_date_wizard_view"/>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="target">new</field>
+    </record>
+</odoo>
+

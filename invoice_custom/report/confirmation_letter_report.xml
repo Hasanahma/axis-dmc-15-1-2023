@@ -1,0 +1,1737 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="action_confirmation_letter_print" model="ir.actions.report">
+            <field name="name">Print Confirmation Letter</field>
+            <field name="model">confirmation.letter.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">invoice_custom.confirmation_letter</field>
+            <field name="report_file">invoice_custom.confirmation_letter</field>
+            <!--            <field name="binding_type">report</field>-->
+            <!--                        <field name="print_report_name">'PRO-FORMA'</field>-->
+            <!--            <field name="binding_model_id" ref="model_transportation_reservation_form"/>-->
+        </record>
+
+        <template inherit_id="web.minimal_layout" id="minimal_layout_inherit">
+            <xpath expr="//head" position="inside">
+                <link rel="preconnect" href="https://fonts.gstatic.com"/>
+                <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic&amp;display=swap"
+                      rel="stylesheet"/>
+            </xpath>
+        </template>
+        <template id="external_layout_standard_custom">
+
+
+            <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout"
+                 t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <div class="pt-5">
+                    <!-- This div ensures that the address is not cropped by the header. -->
+                    <t t-call="web.address_layout"/>
+                </div>
+                <t t-raw="0"/>
+            </div>
+            <!--        My Code Show the footer -->
+            <!--            <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">-->
+            <!--                <div class="text-center" style="border-top: 1px solid black;">-->
+            <!--                    <ul class="list-inline mb4">-->
+            <!--                        &lt;!&ndash; using the list-inline-item class from bootstrap causes weird behaviours in pdf report-->
+            <!--                             adding d-inline class fixes the problem&ndash;&gt;-->
+            <!--                        <li t-if="company.phone" class="list-inline-item d-inline">-->
+            <!--                            <span class="o_force_ltr" t-field="company.phone"/>-->
+            <!--                        </li>-->
+            <!--                        <li t-if="company.email" class="list-inline-item d-inline">-->
+            <!--                            <span t-field="company.email"/>-->
+            <!--                        </li>-->
+            <!--                        <li t-if="company.website" class="list-inline-item d-inline">-->
+            <!--                            <span t-field="company.website"/>-->
+            <!--                        </li>-->
+            <!--                        <li t-if="company.vat" class="list-inline-item d-inline"><t-->
+            <!--                                t-esc="company.country_id.vat_label or 'Tax ID'"/>:-->
+            <!--                            <span t-field="company.vat"/>-->
+            <!--                        </li>-->
+            <!--                    </ul>-->
+
+            <!--                    <div name="financial_infos">-->
+            <!--                        <span t-field="company.report_footer"/>-->
+            <!--                    </div>-->
+
+            <!--                    <div t-if="report_type == 'pdf'" class="text-muted">-->
+            <!--                        Page:-->
+            <!--                        <span class="page"/>-->
+            <!--                        /-->
+            <!--                        <span class="topage"/>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            </div>-->
+        </template>
+        <template id="external_layout_custom_ahmad">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+
+            <t t-call="invoice_custom.external_layout_standard_custom">
+                <t t-raw="0"/>
+            </t>
+
+        </template>
+
+        <template id="confirmation_letter">
+
+            <t t-call="web.html_container">
+                <t t-if="object_confirmation_letter_wizard.show_logo">
+                    <t t-call="web.external_layout" style="background:unset">
+
+                        <div class="page">
+                            <style>
+                                tr { border:1px solid grey; height:30px; page-break-inside:avoid; }
+                                td, th { border:1px solid grey; vertical-align:middle; text-align:center;
+                                font-size:14px; }
+                                th { font-size:14px; }
+                                * { font-family: Garamond, serif;}
+
+                            </style>
+                            <h4 style="text-align:center; text-decoration:underline;">CONFIRMATION LETTER</h4>
+                            <!--                         <span t-esc="sale_order_id"/>-->
+                            <!--                        <t t-if="show_general_information">-->
+                            <t t-if="object_confirmation_letter_wizard.show_general_information">
+
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="4"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif; ">
+                                            General
+                                            information
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Agent
+                                        </td>
+                                        <td>
+                                            <t t-if="object_confirmation_letter_wizard.show_agent">
+                                                <span t-esc="sale_order_id.partner_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Arrival Date
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.arrival_date">
+                                                <span t-esc="sale_order_id.arrival_date"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            File NO
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.name">
+                                                <span t-esc="sale_order_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Departure Date
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.departure_date">
+                                                <span t-esc="sale_order_id.departure_date"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Group Name
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.customer">
+                                                <span t-esc="sale_order_id.customer"/>
+                                            </t>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Pax
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.total_pax">
+                                                <span t-esc="sale_order_id.total_pax"/>
+                                            </t>
+                                            <t t-if="not sale_order_id.total_pax">
+                                                <span>0</span>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <span style="text-align:center;">Reference to the reservation requested please be informed
+                                that
+                                your reservation is
+                                confirmed as
+                                mentioned below:
+                            </span>
+                            <br/>
+                            <br/>
+                            <!--                        <t t-if="show_arr_dep">-->
+                            <t t-if="object_confirmation_letter_wizard.show_arr_dep">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="8"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Arrival /
+                                            departure
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Arr/Dep
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Border
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Flight
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Time
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Pax
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.arrival_departure_expense_ids.sorted(key=lambda a:(a.date))"
+                                        t-as="arr_dep">
+                                        <t t-if="arr_dep.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.name">
+                                                    <span t-esc="arr_dep.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.date">
+                                                    <span t-esc="arr_dep.date"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.border">
+                                                    <span t-esc="arr_dep.border.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.flight">
+                                                    <span t-esc="arr_dep.flight"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.time">
+                                                    <span t-esc="arr_dep.time" t-options='{"widget": "float_time"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.pax">
+                                                    <span t-esc="arr_dep.pax"/>
+                                                </t>
+                                                <t t-if="not arr_dep.pax">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.notes">
+                                                    <span t-esc="arr_dep.notes"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_hotels">-->
+                            <t t-if="object_confirmation_letter_wizard.show_hotels">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="13"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">Hotels
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Check In
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Check Out
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Hotel Name
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Cat.
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Meal
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Pax
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            SGL
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            DBL
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            TRP
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            TWIN
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Other
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.hotels_expense_ids.sorted(key=lambda a:(a.date_from))"
+                                        t-as="hotels">
+                                        <t t-if="hotels.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.date_from">
+                                                    <span t-esc="hotels.date_from"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.date_to">
+                                                    <span t-esc="hotels.date_to"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.name.name">
+                                                    <span t-esc="hotels.name.name"/>
+                                                </t>
+                                            </td>
+
+                                            <td>
+                                                <t t-if="hotels.room_category_id.name">
+                                                    <span t-esc="hotels.room_category_id.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.meal_id.name">
+                                                    <span t-esc="hotels.meal_id.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.pax">
+                                                    <span t-esc="hotels.pax"/>
+                                                </t>
+                                                <t t-if="not hotels.pax">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.sgl_room">
+                                                    <span t-esc="hotels.sgl_room"/>
+                                                </t>
+                                                <t t-if="not hotels.sgl_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.dbl_room">
+                                                    <span t-esc="hotels.dbl_room"/>
+                                                </t>
+                                                <t t-if="not hotels.dbl_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.trp_room">
+                                                    <span t-esc="hotels.trp_room"/>
+                                                </t>
+                                                <t t-if="not hotels.trp_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.twin_room">
+                                                    <span t-esc="hotels.twin_room"/>
+                                                </t>
+                                                <t t-if="not hotels.twin_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.oth_room">
+                                                    <span t-esc="hotels.oth_room"/>
+                                                </t>
+                                                <t t-if="not hotels.oth_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.note">
+                                                    <span t-esc="hotels.note"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_restaurants">-->
+                            <t t-if="object_confirmation_letter_wizard.show_restaurants">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="6"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Restaurants
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Restaurant
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Meal
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Pax No.
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.resturnats_expense_ids.sorted(key=lambda a:(a.date))"
+                                        t-as="restaurants">
+                                        <t t-if="restaurants.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.date">
+                                                    <span t-esc="restaurants.date"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.name.name">
+                                                    <span t-esc="restaurants.name.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.meal_id.name">
+                                                    <span t-esc="restaurants.meal_id.name"/>
+                                                </t>
+                                            </td>
+
+                                            <td>
+                                                <t t-if="restaurants.pax">
+                                                    <span t-esc="restaurants.pax"/>
+                                                </t>
+                                                <t t-if="not restaurants.pax">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.note">
+                                                    <span t-esc="restaurants.note"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_itinerary">-->
+                            <t t-if="object_confirmation_letter_wizard.show_itinerary">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="3"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Itinerary
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Itinerary
+                                            Description
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.itineraries_expense_ids.sorted(key=lambda a:(a.from_date))"
+                                        t-as="Itinerary">
+                                        <t t-if="Itinerary.show == True">
+                                            <!--                                    <t t-esc="str(sale_order_id.itineraries_expense_ids.from_date) if (sale_order_id.itineraries_expense_ids.from_date is not None) />-->
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="Itinerary.from_date">
+                                                    <span t-esc="Itinerary.from_date"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="Itinerary.name">
+                                                    <span t-esc="Itinerary.name"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_transportations">-->
+                            <t t-if="object_confirmation_letter_wizard.show_transportations">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="6"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Transportation
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            From Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            To Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Vehicle
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Trans. Company
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.transportation_expense_ids.sorted(key=lambda a:(a.date_from))"
+                                        t-as="transportations">
+                                        <td>
+                                            <span t-esc="seq"/>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.date_from">
+                                                <span t-esc="transportations.date_from"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.date_to">
+                                                <span t-esc="transportations.date_to"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.vehicles_id.name">
+                                                <span t-esc="transportations.vehicles_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.name.name">
+                                                <span t-esc="transportations.name.name"/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.note">
+                                                <span t-esc="transportations.note"/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;"></td>
+                                        <t t-set="seq" t-value="seq +1"/>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_guides">-->
+                            <t t-if="object_confirmation_letter_wizard.show_guides">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="7"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">Guide
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Guide
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Mobile
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Language
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date From
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date To
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.guide_expense_ids.sorted(key=lambda a:(a.date_from))"
+                                        t-as="guides">
+                                        <t t-if="guides.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.name.name">
+                                                    <span t-esc="guides.name.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.guide_number">
+                                                    <span t-esc="guides.guide_number"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.language_id.name">
+                                                    <span t-esc="guides.language_id.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.date_from">
+                                                    <span t-esc="guides.date_from"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.date_to">
+                                                    <span t-esc="guides.date_to"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.note">
+                                                    <span t-esc="guides.note"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <t t-if="object_confirmation_letter_wizard.show_extras">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="7"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Extras
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Services name
+                                        </td>
+<!--                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">-->
+<!--                                            Supplier-->
+<!--                                        </td>-->
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.extras_expense_ids.sorted(key=lambda a:(a.date))"
+                                        t-as="extra">
+                                        <t t-if="extra.show == True">
+                                            <!--                                    <t t-esc="str(sale_order_id.itineraries_expense_ids.from_date) if (sale_order_id.itineraries_expense_ids.from_date is not None) />-->
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="extra.name">
+                                                    <span t-esc="extra.name.name"/>
+                                                </t>
+                                            </td>
+
+<!--                                            <td>-->
+<!--                                                <t t-if="extra.supplier_id.name">-->
+<!--                                                    <span t-esc="extra.supplier_id.name"/>-->
+<!--                                                </t>-->
+<!--                                            </td>-->
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_rooming_list">-->
+                            <t t-if="object_confirmation_letter_wizard.show_rooming_list">
+
+                                <table style="width:100%">
+
+                                    <tr style="text-align:center">
+                                        <th colspan="4" style="background:rgb(180, 198, 231); font-weight: bold;">
+                                            Rooming
+                                            List
+                                        </th>
+                                    </tr>
+                                    <tr style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            client name
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Room type
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            comment
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+
+                                    <!--                                <t t-foreach="rooms_list" t-as="room">-->
+                                    <t t-foreach="sorted(rooms_list, key=lambda d: d['number'])" t-as="room">
+                                        <tr>
+                                            <!--                                        <td><span t-esc="room['show']"/></td>-->
+
+                                            <td t-att-rowspan="room['len_of_clients']"
+                                                style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="room['number']"/>
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;"
+                                                t-esc="room['clients'][0]['name']">
+
+                                            </td>
+
+                                            <td t-att-rowspan="room['len_of_clients']"
+                                                style="border: 1px solid; padding:5px;">
+                                                <t t-if="room['type']">
+                                                    <span t-esc="room['type']"/>
+                                                </t>
+                                            </td>
+
+                                            <td style="border: 1px solid;padding:5px;">
+                                                <span t-esc="room['clients'][0]['comment']"/>
+                                            </td>
+
+                                            <td style="display:none;"></td>
+                                        </tr>
+
+                                        <t t-if="room['clients']" t-foreach="room['clients'][1:]" t-as="client">
+
+                                            <tr>
+
+                                                <td style="border: 1px solid; padding:5px;">
+                                                    <t t-if="client['name']">
+                                                        <span t-esc="client['name']"/>
+                                                    </t>
+                                                </td>
+
+
+                                                <td style="border: 1px solid; padding:5px;">
+                                                    <t t-if="client['comment']">
+                                                        <span t-esc="client['comment']"
+                                                        />
+                                                    </t>
+                                                </td>
+
+                                                <td style="display:none;"></td>
+
+                                            </tr>
+
+                                        </t>
+
+
+                                    </t>
+                                </table>
+
+                                <br/>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_inclusions">-->
+                            <t t-if="object_confirmation_letter_wizard.show_inclusions">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="3"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Inclusions
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; text-align:left;"
+                                            colspan="2">Inclusions
+                                            / Excluding
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.inclusions_expense_ids" t-as="inclusions">
+                                        <td>
+                                            <span t-esc="seq"/>
+                                        </td>
+                                        <td>
+                                            <t t-if="inclusions.name">
+                                                <span t-esc="inclusions.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="text-align:left;">
+                                            <t t-if="inclusions.inclusion_id.name">
+                                                <span t-esc="inclusions.inclusion_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;"></td>
+                                        <t t-set="seq" t-value="seq +1"/>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_note">-->
+                            <t t-if="object_confirmation_letter_wizard.show_note">
+                                <table style="width:100%; border-spacing:0; border:none;">
+                                    <tr>
+                                        <td>
+                                            <strong style="text-align:center;">Notes</strong>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <t t-if="sale_order_id.general_note">
+                                                <span style="text-align:center;" t-esc="sale_order_id.general_note"/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+
+
+                            <br/>
+                            <span>Should you need any information please do not hesitate to contact us.</span>
+                            <br/>
+                            <br/>
+                            <strong>Kind regards</strong>
+                            <br/>
+                            <span t-esc="&#160; sale_order_id.user_id.name"/>
+                        </div>
+                    </t>
+                </t>
+
+                <t t-if="not object_confirmation_letter_wizard.show_logo">
+                    <t t-call="invoice_custom.external_layout_custom_ahmad" style="background:unset">
+
+                        <div class="page">
+                            <style>
+                                tr { border:1px solid grey; height:30px; page-break-inside:avoid; }
+                                td, th { border:1px solid grey; vertical-align:middle; text-align:center;
+                                font-size:14px; }
+                                th { font-size:14px; }
+                                * { font-family: Garamond, serif;}
+
+                            </style>
+                            <h4 style="text-align:center; text-decoration:underline;">CONFIRMATION LETTER</h4>
+                            <!--                         <span t-esc="sale_order_id"/>-->
+                            <!--                        <t t-if="show_general_information">-->
+                            <t t-if="object_confirmation_letter_wizard.show_general_information">
+
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="4"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif; ">
+                                            General
+                                            information
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Agent
+                                        </td>
+                                        <td>
+                                            <t t-if="object_confirmation_letter_wizard.show_agent">
+                                                <span t-esc="sale_order_id.partner_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Arrival Date
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.arrival_date">
+                                                <span t-esc="sale_order_id.arrival_date"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            File NO
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.name">
+                                                <span t-esc="sale_order_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Departure Date
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.departure_date">
+                                                <span t-esc="sale_order_id.departure_date"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Group Name
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.customer">
+                                                <span t-esc="sale_order_id.customer"/>
+                                            </t>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Pax
+                                        </td>
+                                        <td>
+                                            <t t-if="sale_order_id.total_pax">
+                                                <span t-esc="sale_order_id.total_pax"/>
+                                            </t>
+                                            <t t-if="not sale_order_id.total_pax">
+                                                <span>0</span>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <span style="text-align:center;">Reference to the reservation requested please be informed
+                                that
+                                your reservation is
+                                confirmed as
+                                mentioned bellow:
+                            </span>
+                            <br/>
+                            <br/>
+                            <!--                        <t t-if="show_arr_dep">-->
+                            <t t-if="object_confirmation_letter_wizard.show_arr_dep">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="8"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Arrival /
+                                            departure
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Arr/Dep
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Border
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Flight
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Time
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Pax
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; ">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.arrival_departure_expense_ids.sorted(key=lambda a:(a.date))"
+                                        t-as="arr_dep">
+                                        <t t-if="arr_dep.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.name">
+                                                    <span t-esc="arr_dep.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.date">
+                                                    <span t-esc="arr_dep.date"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.border">
+                                                    <span t-esc="arr_dep.border.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.flight">
+                                                    <span t-esc="arr_dep.flight"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.time">
+                                                    <span t-esc="arr_dep.time" t-options='{"widget": "float_time"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.pax">
+                                                    <span t-esc="arr_dep.pax"/>
+                                                </t>
+                                                <t t-if="not arr_dep.pax">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="arr_dep.notes">
+                                                    <span t-esc="arr_dep.notes"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_hotels">-->
+                            <t t-if="object_confirmation_letter_wizard.show_hotels">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="13"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">Hotels
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Check In
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Check Out
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Hotel Name
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Cat.
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Meal
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Pax
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            SGL
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            DBL
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            TRP
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            TWIN
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Other
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.hotels_expense_ids.sorted(key=lambda a:(a.date_from))"
+                                        t-as="hotels">
+                                        <t t-if="hotels.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.date_from">
+                                                    <span t-esc="hotels.date_from"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.date_to">
+                                                    <span t-esc="hotels.date_to"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.name.name">
+                                                    <span t-esc="hotels.name.name"/>
+                                                </t>
+                                            </td>
+
+                                            <td>
+                                                <t t-if="hotels.room_category_id.name">
+                                                    <span t-esc="hotels.room_category_id.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.meal_id.name">
+                                                    <span t-esc="hotels.meal_id.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.pax">
+                                                    <span t-esc="hotels.pax"/>
+                                                </t>
+                                                <t t-if="not hotels.pax">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.sgl_room">
+                                                    <span t-esc="hotels.sgl_room"/>
+                                                </t>
+                                                <t t-if="not hotels.sgl_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.dbl_room">
+                                                    <span t-esc="hotels.dbl_room"/>
+                                                </t>
+                                                <t t-if="not hotels.dbl_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.trp_room">
+                                                    <span t-esc="hotels.trp_room"/>
+                                                </t>
+                                                <t t-if="not hotels.trp_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.twin_room">
+                                                    <span t-esc="hotels.twin_room"/>
+                                                </t>
+                                                <t t-if="not hotels.twin_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.oth_room">
+                                                    <span t-esc="hotels.oth_room"/>
+                                                </t>
+                                                <t t-if="not hotels.oth_room">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="hotels.note">
+                                                    <span t-esc="hotels.note"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_restaurants">-->
+                            <t t-if="object_confirmation_letter_wizard.show_restaurants">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="6"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Restaurants
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Restaurant
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Meal
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Pax No.
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.resturnats_expense_ids.sorted(key=lambda a:(a.date))"
+                                        t-as="restaurants">
+                                        <t t-if="restaurants.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.date">
+                                                    <span t-esc="restaurants.date"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.name.name">
+                                                    <span t-esc="restaurants.name.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.meal_id.name">
+                                                    <span t-esc="restaurants.meal_id.name"/>
+                                                </t>
+                                            </td>
+
+                                            <td>
+                                                <t t-if="restaurants.pax">
+                                                    <span t-esc="restaurants.pax"/>
+                                                </t>
+                                                <t t-if="not restaurants.pax">
+                                                    <span>0</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="restaurants.note">
+                                                    <span t-esc="restaurants.note"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_itinerary">-->
+                            <t t-if="object_confirmation_letter_wizard.show_itinerary">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="3"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Itinerary
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Itinerary
+                                            Description
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.itineraries_expense_ids.sorted(key=lambda a:(a.from_date))"
+                                        t-as="Itinerary">
+                                        <t t-if="Itinerary.show == True">
+                                            <!--                                    <t t-esc="str(sale_order_id.itineraries_expense_ids.from_date) if (sale_order_id.itineraries_expense_ids.from_date is not None) />-->
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="Itinerary.from_date">
+                                                    <span t-esc="Itinerary.from_date"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="Itinerary.name">
+                                                    <span t-esc="Itinerary.name"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_transportations">-->
+                            <t t-if="object_confirmation_letter_wizard.show_transportations">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="7"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Transportation
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            From Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            To Date
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Vehicle
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Trans. Company
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.transportation_expense_ids.sorted(key=lambda a:(a.date_from))"
+                                        t-as="transportations">
+                                        <td>
+                                            <span t-esc="seq"/>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.date_from">
+                                                <span t-esc="transportations.date_from"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.date_to">
+                                                <span t-esc="transportations.date_to"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.vehicles_id.name">
+                                                <span t-esc="transportations.vehicles_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.name.name">
+                                                <span t-esc="transportations.name.name"/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="transportations.note">
+                                                <span t-esc="transportations.note"/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;"></td>
+                                        <t t-set="seq" t-value="seq +1"/>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_guides">-->
+                            <t t-if="object_confirmation_letter_wizard.show_guides">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="7"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">Guide
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Guide
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Mobile
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Language
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date From
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Date To
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.guide_expense_ids.sorted(key=lambda a:(a.date_from))"
+                                        t-as="guides">
+                                        <t t-if="guides.show == True">
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.name.name">
+                                                    <span t-esc="guides.name.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.guide_number">
+                                                    <span t-esc="guides.guide_number"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.language_id.name">
+                                                    <span t-esc="guides.language_id.name"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.date_from">
+                                                    <span t-esc="guides.date_from"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.date_to">
+                                                    <span t-esc="guides.date_to"
+                                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="guides.note">
+                                                    <span t-esc="guides.note"/>
+                                                </t>
+                                            </td>
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <t t-if="object_confirmation_letter_wizard.show_extras">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="7"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Extras
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Services name
+                                        </td>
+<!--                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">-->
+<!--                                            Supplier-->
+<!--                                        </td>-->
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.extras_expense_ids.sorted(key=lambda a:(a.date))"
+                                        t-as="extra">
+
+
+                                        <t t-if="extra.show == True">
+                                            <!--                                    <t t-esc="str(sale_order_id.itineraries_expense_ids.from_date) if (sale_order_id.itineraries_expense_ids.from_date is not None) />-->
+                                            <td>
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="extra.name">
+                                                    <span t-esc="extra.name.name"/>
+                                                </t>
+                                            </td>
+
+<!--                                            <td>-->
+<!--                                                <t t-if="extra.supplier_id.name">-->
+<!--                                                    <span t-esc="extra.supplier_id.name"/>-->
+<!--                                                </t>-->
+<!--                                            </td>-->
+
+
+                                            <td style="display:none;"></td>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_rooming_list">-->
+                            <t t-if="object_confirmation_letter_wizard.show_rooming_list">
+
+                                <table style="width:100%">
+
+                                    <tr style="text-align:center">
+                                        <th colspan="4" style="background:rgb(180, 198, 231); font-weight: bold;">
+                                            Rooming
+                                            List
+                                        </th>
+                                    </tr>
+                                    <tr style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            client name
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            Room type
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            comment
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+
+                                    <!--                                <t t-foreach="rooms_list" t-as="room">-->
+                                    <t t-foreach="sorted(rooms_list, key=lambda d: d['number'])" t-as="room">
+                                        <tr>
+                                            <!--                                        <td><span t-esc="room['show']"/></td>-->
+
+                                            <td t-att-rowspan="room['len_of_clients']"
+                                                style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="room['number']"/>
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;"
+                                                t-esc="room['clients'][0]['name']">
+
+                                            </td>
+
+                                            <td t-att-rowspan="room['len_of_clients']"
+                                                style="border: 1px solid; padding:5px;">
+                                                <t t-if="room['type']">
+                                                    <span t-esc="room['type']"/>
+                                                </t>
+                                            </td>
+
+                                            <td style="border: 1px solid;padding:5px;">
+                                                <span t-esc="room['clients'][0]['comment']"/>
+                                            </td>
+
+                                            <td style="display:none;"></td>
+                                        </tr>
+
+                                        <t t-if="room['clients']" t-foreach="room['clients'][1:]" t-as="client">
+
+                                            <tr>
+
+                                                <td style="border: 1px solid; padding:5px;">
+                                                    <t t-if="client['name']">
+                                                        <span t-esc="client['name']"/>
+                                                    </t>
+                                                </td>
+
+
+                                                <td style="border: 1px solid; padding:5px;">
+                                                    <t t-if="client['comment']">
+                                                        <span t-esc="client['comment']"
+                                                        />
+                                                    </t>
+                                                </td>
+
+                                                <td style="display:none;"></td>
+
+                                            </tr>
+
+                                        </t>
+
+
+                                    </t>
+                                </table>
+
+                                <br/>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_inclusions">-->
+                            <t t-if="object_confirmation_letter_wizard.show_inclusions">
+                                <table style="width:100%; border-spacing:0;">
+                                    <tr style="text-align:center">
+                                        <th colspan="3"
+                                            style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                            Inclusions
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px;">
+                                            #
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif; font-size:14px; text-align:left;"
+                                            colspan="2">Inclusions
+                                            / Excluding
+                                        </td>
+                                        <td style="display:none;"></td>
+                                    </tr>
+                                    <t t-set="seq" t-value="1"/>
+                                    <tr t-foreach="sale_order_id.inclusions_expense_ids" t-as="inclusions">
+                                        <td>
+                                            <span t-esc="seq"/>
+                                        </td>
+                                        <td>
+                                            <t t-if="inclusions.name">
+                                                <span t-esc="inclusions.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="text-align:left;">
+                                            <t t-if="inclusions.inclusion_id.name">
+                                                <span t-esc="inclusions.inclusion_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;"></td>
+                                        <t t-set="seq" t-value="seq +1"/>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+                            <!--                        <t t-if="show_note">-->
+                            <t t-if="object_confirmation_letter_wizard.show_note">
+                                <table style="width:100%; border-spacing:0; border:none;">
+                                    <tr>
+                                        <td>
+                                            <strong style="text-align:center;">Notes</strong>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <t t-if="sale_order_id.general_note">
+                                                <span style="text-align:center;" t-esc="sale_order_id.general_note"/>
+                                            </t>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </t>
+                            <br/>
+
+
+                            <br/>
+                            <span>Should you need any information please do not hesitate to contact us.</span>
+                            <br/>
+                            <br/>
+                            <strong>Kind regards</strong>
+                            <br/>
+                            <span t-esc="&#160; sale_order_id.user_id.name"/>
+                        </div>
+                    </t>
+                </t>
+
+            </t>
+        </template>
+
+
+    </data>
+</odoo>

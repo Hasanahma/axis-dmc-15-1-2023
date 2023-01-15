@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="custom_paper_format_qweb_report" model="report.paperformat">
+        <field name="name">Axis report qweb paperformat</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">28</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">25</field>
+        <field name="dpi">110</field>
+    </record>
+
+    <record id="action_report_groups_run_down_by_arrival_date" model="ir.actions.report">
+        <field name="name">Groups run down by arrival date</field>
+        <field name="model">sale.custom.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.groups_run_down_by_arrival_date</field>
+        <field name="report_file">invoice_custom.groups_run_down_by_arrival_date</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report"/>
+    </record>
+
+    <template id="invoice_custom.groups_run_down_by_arrival_date">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="form" t-as="o">
+                    <div class="page" style="text-align:center">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            table {
+                            font-size: 17px;
+                            }
+                        </style>
+                        <h1>Axis DMC</h1>
+                        <h1>GROUPS RUN DOWN BY ARRIVAL DATE REPORT</h1>
+
+
+                        <!--                    <div style="width:100%; border: 1px solid black; padding:1%;">-->
+                        <!--                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"-->
+                        <!--                                   cellpadding="0">-->
+                        <!--                                <tr>-->
+                        <!--                                    <td style="border-right: none;">-->
+                        <!--                                        <b>To:</b>-->
+                        <!--                                    </td>-->
+                        <!--                                    <td>-->
+                        <!--                                        <span style="margin-left:50px;" t-esc="hotels_id.name.name"/>-->
+                        <!--                                    </td>-->
+                        <!--                                    <td style="border-right: none;">-->
+                        <!--                                        <b>File No:</b>-->
+                        <!--                                    </td>-->
+                        <!--                                    <td>-->
+                        <!--                                        <span style="margin-left:50px;" t-esc="sale_order_id.name"/>-->
+                        <!--                                    </td>-->
+                        <!--                                </tr>-->
+                        <!--                                <tr>-->
+                        <!--                                    <t t-if="object_hotel_reservation_form_report_wizard.show_reservation">-->
+                        <!--                                        <td style="border-right: none;">-->
+                        <!--                                            <b>Att:</b>-->
+                        <!--                                        </td>-->
+                        <!--                                        <td>-->
+                        <!--                                            <span style="margin-left:50px;">Reservation Department</span>-->
+                        <!--                                        </td>-->
+                        <!--                                    </t>-->
+
+                        <!--                                    <t t-if="object_hotel_reservation_form_report_wizard.show_voucher">-->
+                        <!--                                        <td style="border-right: none;">-->
+                        <!--                                            <b>Att:</b>-->
+                        <!--                                        </td>-->
+                        <!--                                        <td>-->
+                        <!--                                            <span style="margin-left:50px;">Voucher Department</span>-->
+                        <!--                                        </td>-->
+                        <!--                                    </t>-->
+
+                        <!--                                    <td style="border-right: none;">-->
+                        <!--                                        <b>Tel:</b>-->
+                        <!--                                    </td>-->
+                        <!--                                    <td>-->
+                        <!--                                        <span style="margin-left:50px;" t-esc="hotels_id.name.phone"/>-->
+                        <!--                                    </td>-->
+                        <!--                                </tr>-->
+                        <!--                                <tr>-->
+                        <!--                                    <td style="border-right: none;">-->
+                        <!--                                        <b>From:</b>-->
+                        <!--                                    </td>-->
+                        <!--                                    <td>-->
+                        <!--                                        <span style="margin-left:50px;" t-esc="hotels_id.create_uid.name"/>-->
+                        <!--                                    </td>-->
+                        <!--                                    <td style="border-right: none;">-->
+                        <!--                                        <b>Email:</b>-->
+                        <!--                                    </td>-->
+                        <!--                                    <td>-->
+                        <!--                                        <span style="margin-left:50px;" t-esc="hotels_id.name.email"/>-->
+                        <!--                                    </td>-->
+                        <!--                                </tr>-->
+                        <!--                                <tr>-->
+                        <!--                                    <td style="border-right: none;">-->
+                        <!--                                        <b>Date:</b>-->
+
+                        <!--                                    </td>-->
+                        <!--                                    <td colspan="3">-->
+                        <!--                                        <span style="margin-left:50px;"-->
+                        <!--                                              t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>-->
+                        <!--                                    </td>-->
+                        <!--                                </tr>-->
+                        <!--                            </table>-->
+                        <!--                        </div>-->
+
+
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">From Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['from_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Issue Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">To Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['to_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <br/>
+
+                        <table style="width:100%" class="table table-sm o_main_table">
+                            <thead>
+                                <tr style="background-color: silver; border: 1px solid;">
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        File No.
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Group Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Pax
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Arr. Date
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Dep. Date
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        User Name
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </thead>
+                            <t t-set="total_pax" t-value="0"/>
+                            <tr t-foreach="orders" t-as="order">
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="order['name']"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px;">
+                                    <span t-esc="order['customer']"/>
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="order['total_pax']"/>
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="order['arrival_date']"
+                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+                                    <span t-esc="order['departure_date']"
+                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px;">
+                                    <span t-esc="order['create_uid'][1]"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                                <t t-set="total_pax" t-value="total_pax + order['total_pax']"/>
+                            </tr>
+                            <tr style="text-align:center">
+                                <td style="border: 1px solid; padding:5px;" colspan="2">
+                                    Total Pax:
+                                </td>
+                                <td style="border: 1px solid; padding:5px;">
+                                    <span t-esc="total_pax"/>
+                                </td>
+
+                            </tr>
+
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

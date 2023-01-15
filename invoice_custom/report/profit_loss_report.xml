@@ -1,0 +1,475 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+
+    <record id="action_report_axis_profit_loss" model="ir.actions.report">
+        <field name="name">Axis Profit/Loss</field>
+        <field name="model">sale.custom.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.profit_loss</field>
+        <field name="report_file">invoice_custom.profit_loss</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report_landscape"/>
+    </record>
+
+    <template id="invoice_custom.profit_loss">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="form" t-as="o">
+                    <div class="page" style="text-align:center">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            table {
+                            font-size: 17px;
+                            }
+                        </style>
+                        <h1>Axis DMC</h1>
+                        <h1>PROFIT/LOSS REPORT</h1>
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <t t-if="not o['sale_order_id']">
+                                        <tr>
+                                            <td style="text-align: left;">
+                                                <b style="margin-right: 10px;">From Date:</b>
+                                            </td>
+                                            <td style="text-align: left;">
+                                                <span t-esc="o['from_date']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="text-align: left;">
+                                                <b style="margin-right: 10px;">Issue Date:</b>
+                                            </td>
+                                            <td style="text-align: left;">
+                                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <tr>
+                                        <td style="text-align: left;">
+                                            <b style="margin-right: 10px;">Issue Date</b>
+                                        </td>
+                                        <td style="text-align: left;">
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <br/>
+                        <table style="width:100%">
+                            <thead>
+                                <tr style="background-color: silver; border: 1px solid;">
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        SO#
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Agent
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Customer
+                                    </td>
+                                    <td style="width:10%;border: 1px black solid; text-align:center;">
+                                        Invoiced amount
+                                    </td>
+
+                                    <td style="width:10%;border: 1px black solid; text-align:center;">
+                                        Actual cost
+                                    </td>
+                                    <td style="width:10%;border: 1px black solid; text-align:center;">
+                                        Profit/Loss
+                                    </td>
+                                    <td style="width:10%;border: 1px black solid; text-align:center;">
+                                        Net Profit Margin
+                                    </td>
+                                    <td style="width:10%;border: 1px black solid; text-align:center;">
+                                        Status Of cost
+                                    </td>
+                                    <td style="width:10%;border: 1px black solid; text-align:center;">
+                                        Status Of Payment
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </thead>
+                            <t t-set="sum_invoiced_amount_usd" t-value="0"/>
+                            <t t-set="sum_invoiced_amount_jod" t-value="0"/>
+                            <t t-set="sum_actual_cost_usd" t-value="0"/>
+                            <t t-set="sum_actual_cost_jod" t-value="0"/>
+                            <t t-set="sum_profit_loss_usd" t-value="0"/>
+                            <t t-set="sum_profit_loss_jod" t-value="0"/>
+                            <t t-foreach="orders" t-as="order">
+
+                                <t t-if="order['state'] == 'cancel'">
+                                    <tr>
+                                        <td style="border: 1px solid; text-align:left; padding:5px;">
+                                            <span style="color:red;" t-esc="order['name']"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-if="order['partner_id']">
+                                                <span style="color:red;" t-esc="order['partner_id'][1]"/>
+                                            </t>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:left; padding:5px;">
+                                            <span style="color:red;" t-esc="order['customer']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="o['currency'] == 'USD'">
+                                                <span style="color:red;" t-esc="order['invoiced_amount'] * o['currency_rate']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_invoiced_amount_usd"
+                                                   t-value="(order['invoiced_amount'] * o['currency_rate']) + sum_invoiced_amount_usd"/>
+
+                                            </t>
+                                            <t t-if="o['currency'] == 'JOD'">
+                                                <span style="color:red;" t-esc="order['invoiced_amount']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_invoiced_amount_jod"
+                                                   t-value="(order['invoiced_amount']) + sum_invoiced_amount_jod"/>
+                                            </t>
+                                            <span style="color:red;" t-esc="o['currency']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="o['currency'] == 'USD'">
+                                                <span style="color:red;" t-esc="order['actual_expense_total'] * o['currency_rate']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_actual_cost_usd"
+                                                   t-value="(order['actual_expense_total'] * o['currency_rate']) + sum_actual_cost_usd"/>
+                                            </t>
+                                            <t t-if="o['currency'] == 'JOD'">
+                                                <span style="color:red;" t-esc="order['actual_expense_total']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_actual_cost_jod"
+                                                   t-value="(order['actual_expense_total']) + sum_actual_cost_jod"/>
+                                            </t>
+                                            <span style="color:red;" t-esc="o['currency']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="o['currency'] == 'USD'">
+                                                <span style="color:red;" t-esc="(order['profit_loss']) * o['currency_rate']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_profit_loss_usd"
+                                                   t-value="((order['profit_loss']) * o['currency_rate']) + sum_profit_loss_usd"/>
+                                            </t>
+                                            <t t-if="o['currency'] == 'JOD'">
+                                                <span style="color:red;" t-esc="order['profit_loss']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_profit_loss_jod"
+                                                   t-value="(order['profit_loss']) + sum_profit_loss_jod"/>
+                                            </t>
+                                            <span style="color:red;" t-esc="o['currency']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                            <span style="color:red;" t-esc="order['net_profit_margin'] * 100"
+                                                  t-options='{"widget": "float", "precision": 1}'/>
+                                            <span style="color:red;">%</span>
+
+
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-if="order['cost_status'] == 'pending'"><span style="color:red;">Pending</span></t>
+                                            <t t-if="order['cost_status'] == 'close'"><span style="color:red;">Close</span></t>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span style="color:red;" t-esc="order['payment_state']"/>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="order['state'] != 'cancel'">
+                                    <tr>
+                                        <td style="border: 1px solid; text-align:left; padding:5px;">
+                                            <span t-esc="order['name']"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-if="order['partner_id']">
+                                                <span t-esc="order['partner_id'][1]"/>
+                                            </t>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:left; padding:5px;">
+                                            <span t-esc="order['customer']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="o['currency'] == 'USD'">
+                                                <span t-esc="order['invoiced_amount'] * o['currency_rate']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_invoiced_amount_usd"
+                                                   t-value="(order['invoiced_amount'] * o['currency_rate']) + sum_invoiced_amount_usd"/>
+
+                                            </t>
+                                            <t t-if="o['currency'] == 'JOD'">
+                                                <span t-esc="order['invoiced_amount']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_invoiced_amount_jod"
+                                                   t-value="(order['invoiced_amount']) + sum_invoiced_amount_jod"/>
+                                            </t>
+                                            <span t-esc="o['currency']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="o['currency'] == 'USD'">
+                                                <span t-esc="order['actual_expense_total'] * o['currency_rate']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_actual_cost_usd"
+                                                   t-value="(order['actual_expense_total'] * o['currency_rate']) + sum_actual_cost_usd"/>
+                                            </t>
+                                            <t t-if="o['currency'] == 'JOD'">
+                                                <span t-esc="order['actual_expense_total']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_actual_cost_jod"
+                                                   t-value="(order['actual_expense_total']) + sum_actual_cost_jod"/>
+                                            </t>
+                                            <span t-esc="o['currency']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="o['currency'] == 'USD'">
+                                                <span t-esc="(order['profit_loss']) * o['currency_rate']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_profit_loss_usd"
+                                                   t-value="((order['profit_loss']) * o['currency_rate']) + sum_profit_loss_usd"/>
+                                            </t>
+                                            <t t-if="o['currency'] == 'JOD'">
+                                                <span t-esc="order['profit_loss']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <t t-set="sum_profit_loss_jod"
+                                                   t-value="(order['profit_loss']) + sum_profit_loss_jod"/>
+                                            </t>
+                                            <span t-esc="o['currency']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                            <span t-esc="order['net_profit_margin'] * 100"
+                                                  t-options='{"widget": "float", "precision": 1}'/>
+                                            %
+
+
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <t t-if="order['cost_status'] == 'pending'"><span>Pending</span></t>
+                                            <t t-if="order['cost_status'] == 'close'"><span>Close</span></t>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="order['payment_state']"/>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <t t-if="o['currency'] == 'USD'">
+                                <tr>
+
+                                    <td style="border: 1px solid; padding:5px; font-weight:bold;">
+                                        TOTAL
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px; font-weight:bold;">
+
+                                        <span t-esc="sum_invoiced_amount_usd"
+                                              t-options='{"widget": "float", "precision": 3}'/>
+                                        <span t-esc="o['currency']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px; font-weight:bold;">
+                                        <span t-esc="sum_actual_cost_usd"
+                                              t-options='{"widget": "float", "precision": 3}'/>
+                                        <span t-esc="o['currency']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px; font-weight:bold;">
+                                        <span t-esc="sum_profit_loss_usd"
+                                              t-options='{"widget": "float", "precision": 3}'/>
+                                        <span t-esc="o['currency']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    </td>
+                                </tr>
+                            </t>
+
+                            <t t-if="o['currency'] == 'JOD'">
+                                <tr>
+
+                                    <td style="border: 1px solid; padding:5px; font-weight:bold;">
+                                        TOTAL
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px; font-weight:bold;">
+
+                                        <span t-esc="sum_invoiced_amount_jod"
+                                              t-options='{"widget": "float", "precision": 3}'/>
+                                        <span t-esc="o['currency']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px; font-weight:bold;">
+                                        <span t-esc="sum_actual_cost_jod"
+                                              t-options='{"widget": "float", "precision": 3}'/>
+                                        <span t-esc="o['currency']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px; font-weight:bold;">
+                                        <span t-esc="sum_profit_loss_jod"
+                                              t-options='{"widget": "float", "precision": 3}'/>
+                                        <span t-esc="o['currency']"/>
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    </td>
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    </td>
+                                </tr>
+                            </t>
+
+                        </table>
+                        <br/>
+                        <t t-if="o['sale_order_id']">
+                            <h2>Invoice Details</h2>
+                            <br/>
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Label
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Subtotal
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="total" t-value="0"/>
+                                <tr t-foreach="invoice_lines" t-as="line">
+
+                                    <td style="border: 1px solid; text-align:center; padding:5px;">
+                                        <span t-esc="line['label']"/>
+                                    </td>
+                                    <t t-if="o['currency'] == 'JOD'">
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="line['amount']"
+                                                  t-options='{"widget": "float", "precision": 3}'/>
+                                            <span t-esc="o['currency']"/>
+                                        </td>
+                                    </t>
+                                    <t t-if="o['currency'] == 'USD'">
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="line['amount'] * o['currency_rate']"
+                                                  t-options='{"widget": "float", "precision": 3}'/>
+                                            <span t-esc="o['currency']"/>
+                                        </td>
+                                    </t>
+                                    <t t-if="o['currency'] == 'JOD'">
+                                        <t t-set="total" t-value="total + line['amount']"/>
+                                    </t>
+                                    <t t-if="o['currency'] == 'USD'">
+                                        <t t-set="total" t-value="total + (line['amount'] * o['currency_rate'])"/>
+                                    </t>
+                                </tr>
+                                <tr style="text-align:center">
+                                    <td style="border: 1px solid; padding:5px;">
+                                        Total:
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span t-esc="total" t-options='{"widget": "float", "precision": 3}'/>
+                                        <span t-esc="o['currency']"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <t t-if="cost_lines">
+                                <h2>Actual Cost Details</h2>
+                                <table style="width:100%">
+                                    <thead>
+                                        <tr style="background-color: silver; border: 1px solid;">
+                                            <td style="border: 1px black solid; text-align:center;">
+                                                Description
+                                            </td>
+                                            <td style="border: 1px black solid; text-align:center;">
+                                                Journal Entry
+                                            </td>
+                                            <td style="border: 1px black solid; text-align:center;">
+                                                Type
+                                            </td>
+                                            <td style="border: 1px black solid; text-align:center;">
+                                                Amount
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <t t-set="total" t-value="0"/>
+                                    <tr t-foreach="cost_lines" t-as="cost_line">
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="cost_line['name']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="cost_line['move_name']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="cost_line['expense_type_id']">
+                                                <span t-esc="cost_line['expense_type_id'][1]"/>
+                                            </t>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <t t-if="o['currency'] == 'JOD'">
+                                                <span t-esc="cost_line['debit']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <span t-esc="o['currency']"/>
+                                            </t>
+                                            <t t-if="o['currency'] == 'USD'">
+                                                <span t-esc="cost_line['debit'] * o['currency_rate']"
+                                                      t-options='{"widget": "float", "precision": 3}'/>
+                                                <span t-esc="o['currency']"/>
+                                            </t>
+                                        </td>
+                                        <t t-if="o['currency'] == 'JOD'">
+                                            <t t-set="total" t-value="total + cost_line['debit']"/>
+                                        </t>
+                                        <t t-if="o['currency'] == 'USD'">
+                                            <t t-set="total" t-value="total + (cost_line['debit'] * o['currency_rate'])"/>
+                                        </t>
+                                    </tr>
+                                    <tr style="text-align:center">
+                                        <td style="border: 1px solid; padding:5px;" colspan="3">
+                                            Total:
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="total" t-options='{"widget": "float", "precision": 3}'/>
+                                            <span t-esc="o['currency']"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

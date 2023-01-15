@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <data>
+        <record id="confirmation_letter_email" model="mail.template">
+            <field name="name">Confirmation Letter Email</field>
+            <field name="model_id" ref="invoice_custom.model_confirmation_letter_wizard"></field>
+             <field name="email_from">almashaqbeh1912@gmail.com</field>
+<!--             <field name="email_to">abdullah.almashaqbeh@flex-ops.com</field>-->
+            <!-- <field name="email_cc">${(self.env.user.login)|safe}</field> -->
+            <field name="subject">You Email Subject Goes Here</field>
+            <field name="body_html"><![CDATA[
+                    <p><strong>Dear Manager(s)</strong></p>
+                    <p><strong>Department: --department--</strong></p>
+                    <p>Please do the following actvities.</p>
+                    <ol>
+                        <li>Activity 1 <strong>--variable_holds_dynamic_data_1--</strong>.</li>
+                        <li>Activity 2 <strong>--variable_holds_dynamic_data_2--</strong>.</li>
+                        <li>Activity 3 <strong>--variable_holds_dynamic_data_3--</strong>.</li>
+                        <li>Activity 4 <strong>--variable_holds_dynamic_data_4--</strong>.</li>
+                    </ol>
+                    <p>For more information, Please review the product <strong>--product_number_goes_here--</strong>.</p>
+                    <p>After successfully complestion of above activities, please reply-all to this email thread.</p>
+                    <p>Regards,</p>
+                    <p>Department</p>
+                    <p><strong>--brach--</strong></p>
+                    ]]>
+            </field>
+
+
+
+            <field name="report_template" ref="invoice_custom.action_confirmation_letter_print"/>
+        </record>
+    </data>
+
+</odoo>

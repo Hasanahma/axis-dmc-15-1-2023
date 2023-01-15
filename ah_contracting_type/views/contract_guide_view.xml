@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="guide_contract_tree" model="ir.ui.view">
+        <field name="name">guide.contract.tree</field>
+        <field name="model">contract.guide</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name_guide"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="guide_contract_search" model="ir.ui.view">
+        <field name="name">guide_contract.search</field>
+        <field name="model">contract.guide</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name_guide"/>
+                <filter string="Contract Guide" name="group_by_name_contract" context="{'group_by':'name_contract'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="guide_contract_form" model="ir.ui.view">
+        <field name="name">guide.contract.form</field>
+        <field name="model">contract.guide</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group col="4">
+
+                        <field name="name_contract"/>
+                        <field name="name_guide"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="currency_id"/>
+                        <field name="exchange_rate"/>
+
+                    </group>
+                    <notebook>
+                        <page string="Rate">
+                            <group col="4">
+                                <field name="guide_fees_per_day"/>
+                                <field name="overnights_per_day"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_guide_contract" model="ir.actions.act_window">
+        <field name="name">Contract Guide</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">contract.guide</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_group_by_name_contract': 1}</field>
+    </record>
+
+
+    <menuitem id="guide_menu"
+              name="Contract Guide"
+              parent="contracts_menu"
+              sequence="4"
+              action="action_guide_contract"/>
+
+
+</odoo>
+
+
+
+

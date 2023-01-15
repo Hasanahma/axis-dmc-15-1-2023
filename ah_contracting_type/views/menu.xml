@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="contract_menu_configuration"
+                  name="Configuration"
+                  parent="contracting_type_menu"
+                  sequence="2"/>
+
+    </data>
+</odoo>

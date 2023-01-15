@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="action_report_information_form" model="ir.actions.report">
+        <field name="name">Information form</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.information_form</field>
+        <field name="report_file">invoice_custom.information_form</field>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report"/>
+    </record>
+
+    <template id="invoice_custom.information_form">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="text-align:center">
+                    <h3>
+                        <u>الحلف للسياحة والسفر</u>
+                    </h3>
+                    <div dir="rtl" style="width:98%; border: 1px solid black; padding:1%;">
+                        <table>
+                            <tr>
+                                <td style="width:20%">
+                                    <b>رقم الملف:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 55%;">
+                                    <span t-esc="o.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%">
+                                    <b>اسم المجموعة:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 55%; ">
+                                    <span t-esc="o.customer"/>
+                                </td>
+                                <td style="width:20%">
+                                    <b>بيانات الحافلة:</b>
+                                </td>
+                                <td style="margin-left:70px; ">
+                                    ؟؟؟؟
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%">
+                                    <b>عدد الاشخاص:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 55%; ">
+                                    <span t-esc="o.total_pax"/>
+                                </td>
+                                <td style="width:20%">
+                                    <b>بيانات السائق:</b>
+                                </td>
+                                <td style="margin-left:70px;">؟؟؟</td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%">
+                                    <b>الجنسية:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 55%; ">
+                                    <span t-esc="o.nationality_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%">
+                                    <b>الدليل:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 55%; ">
+                                    <t t-if="o.guide_expense_ids">
+                                        <span t-esc="o.guide_expense_ids[0].name.name"/>
+                                    </t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%">
+                                    <b>اسم المندوب:</b>
+                                </td>
+                                <td style="margin-left:50px; width: 55%; ">
+                                    <span t-esc="o.partner_id.name"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+
+                    <br/>
+                    <div dir="rtl" style="width:98%; border: 1px solid black; padding:1%;">
+                        <table>
+                            <tr>
+                                <td style="width:20%;">
+                                    <b>تاريخ الوصول:</b>
+                                </td>
+                                <td style="margin-right:20px; width:20%;">
+                                    <span t-esc="o.arrival_date" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                </td>
+                                <td style="width:20%;">
+                                    <b>نقطة الوصول:</b>
+                                </td>
+                                <td style="margin-right:20px; width:20%;">
+                                    <span t-esc="o.name"/>
+                                </td >
+                                <td style="width:20%;">
+                                    <b>عدد الاشخاص:</b>
+                                </td>
+                                <td style="margin-right:20px; width:20%;">
+                                    <span t-esc="o.total_pax"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">
+                                    <b>تاريخ المغادرة:</b>
+                                </td>
+                                <td style="margin-right:20px; width:20%;">
+                                    <span t-esc="o.departure_date" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                </td>
+                                <td style="width:20%;">
+                                    <b>نقطة المغادرة:</b>
+                                </td>
+                                <td style="margin-right:20px; width:20%;">
+                                    <span t-esc="o.name"/>
+                                </td>
+                                <td style="width:20%;">
+                                    <b>عدد الاشخاص:</b>
+                                </td>
+                                <td style="margin-right:20px; width:20%;">
+                                    <span t-esc="o.total_pax"/>
+                                </td>
+                            </tr>
+
+
+                        </table>
+                    </div>
+                    <p dir="rtl" style="text-align:right">
+                        <strong>
+                            <u>البرنامج</u>
+                        </strong>
+                    </p>
+                    <div dir="rtl" >
+                        <table style="width:90%">
+                        <tr t-foreach="o.itineraries_expense_ids" t-as="i">
+                            <td >
+                                <span t-esc="i['from_date']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>:
+                            </td>
+                            <td style="margin-right: 15px;">
+                                <span t-esc="i['name']"/>
+                            </td>
+                        </tr>
+                    </table>
+                    </div>
+                    <br/>
+                    <table style="width:100%">
+                        <thead>
+                            <tr style="background-color: silver; border: 1px solid;">
+                                <td style="border: 1px black solid; text-align:center;">
+                                    #
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Name
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Nationality
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Passport #
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Issue Date
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    Expiry Date
+                                </td>
+                                <td style="border: 1px black solid; text-align:center;">
+                                    D.O.B
+                                </td>
+                                 <td style="display:none;">
+                                 </td>
+                            </tr>
+                        </thead>
+                        <t t-set="seq" t-value="1"/>
+                        <tr t-foreach="o.clients_passport_ids" t-as="passport">
+                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                <span t-esc="seq"/>
+                            </td>
+                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                <span t-esc="passport['name']"/>
+                            </td>
+                            <td style="border: 1px solid; padding:5px;">
+                                <span t-esc="passport['nationality_id']['name']"/>
+                            </td>
+                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                <span t-esc="passport['passport_number']"/>
+                            </td>
+                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                <span t-esc="passport['issue_date']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                            </td>
+                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                <span t-esc="passport['expiry_date']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                            </td>
+                            <td style="border: 1px solid; padding:5px;">
+                                <span t-esc="passport['birth_date']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                            </td>
+                            <t t-set="seq" t-value="seq + 1"/>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+        </t>
+    </template>
+</odoo>

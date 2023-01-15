@@ -1,0 +1,541 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="action_report_hotel_run_down" model="ir.actions.report">
+        <field name="name">Hotel run down by arrival date</field>
+        <field name="model">sale.custom.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.hotel_run_down</field>
+        <field name="report_file">invoice_custom.hotel_run_down</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report_landscape"/>
+    </record>
+
+    <template id="invoice_custom.hotel_run_down">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="form" t-as="o">
+                    <div class="page" style="text-align:center">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            table {
+                            font-size: 17px;
+                            }
+                        </style>
+
+                        <h1>Axis DMC</h1>
+                        <h1>HOTEL RUN DOWN BY ARRIVAL DATE REPORT</h1>
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">From Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['from_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Issue Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">To Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['to_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                </tr>
+
+                                <td style="text-align: left;">
+                                    <b style="margin-right: 10px;">Status :</b>
+                                    <t t-if="o['all_status']==True">
+                                        <span>All Status</span>
+                                    </t>
+                                    <t t-if="not o['all_status']==True and o['status_id']">
+                                        <span style="margin-right: 10px;" t-esc="o['status_id'][1]"/>
+                                    </t>
+                                </td>
+
+                            </table>
+
+                        </div>
+                        <br/>
+                        <br/>
+                        <t t-set="sum_total_pax" t-value="0"/>
+                        <t t-set="sum_total_sgl" t-value="0"/>
+                        <t t-set="sum_total_dbl" t-value="0"/>
+                        <t t-set="sum_total_trp" t-value="0"/>
+                        <t t-set="sum_total_twin" t-value="0"/>
+                        <t t-set="sum_total_rn" t-value="0"/>
+                        <t t-set="sum_total_trn" t-value="0"/>
+                        <t t-set="sum_total_bed" t-value="0"/>
+                        <tr t-foreach="orders" t-as="order">
+                            <H2>Hotel Name:
+                                <t t-if="order[0]">
+                                    <span t-esc="order[0]['name']"/>
+                                </t>
+                            </H2>
+
+                            <table style="width:100%" class="table table-sm o_main_table">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            File No.
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Group Name
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check In
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check Out
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Meal
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Pax
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            SGL
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            DBL
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            TRP
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            TWIN
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            R.N
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            T.R.N
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Bed N
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Room Type
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="total_pax" t-value="0"/>
+                                <t t-set="total_sgl" t-value="0"/>
+                                <t t-set="total_dbl" t-value="0"/>
+                                <t t-set="total_trp" t-value="0"/>
+                                <t t-set="total_twin" t-value="0"/>
+                                <t t-set="total_rn" t-value="0"/>
+                                <t t-set="total_trn" t-value="0"/>
+                                <t t-set="total_bed" t-value="0"/>
+
+                                <t t-if="form[0]['date_filter'] == 'from_date'">
+                                    <tr t-foreach="sorted(order, key=lambda d: d['date_from']) " t-as="line">
+                                        <t t-if="line['status'] == 'cancel'">
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="line['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="line['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_from']" style="color:red;"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_to']" style="color:red;"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['meal']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['sgl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['dbl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['trp_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['twin_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['nights']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['trn']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['nights'] * line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['room_type']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['note']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-set="total_pax" t-value="total_pax + line['pax']"/>
+                                            <t t-set="total_sgl" t-value="total_sgl + line['sgl_room']"/>
+                                            <t t-set="total_dbl" t-value="total_dbl + line['dbl_room']"/>
+                                            <t t-set="total_trp" t-value="total_trp + line['trp_room']"/>
+                                            <t t-set="total_twin" t-value="total_twin + line['twin_room']"/>
+                                            <t t-set="total_rn" t-value="total_rn + line['nights']"/>
+                                            <t t-set="total_trn" t-value="total_trn + line['trn']"/>
+                                            <t t-set="total_bed" t-value="total_bed + (line['nights'] * line['pax'])"/>
+
+                                            <t t-set="sum_total_pax" t-value="sum_total_pax + line['pax']"/>
+                                            <t t-set="sum_total_sgl" t-value="sum_total_sgl + line['sgl_room']"/>
+                                            <t t-set="sum_total_dbl" t-value="sum_total_dbl + line['dbl_room']"/>
+                                            <t t-set="sum_total_trp" t-value="sum_total_trp + line['trp_room']"/>
+                                            <t t-set="sum_total_twin" t-value="sum_total_twin + line['twin_room']"/>
+                                            <t t-set="sum_total_rn" t-value="sum_total_rn + line['nights']"/>
+                                            <t t-set="sum_total_trn" t-value="sum_total_trn + line['trn']"/>
+                                            <t t-set="sum_total_bed"
+                                               t-value="sum_total_bed + (line['nights'] * line['pax'])"/>
+                                        </t>
+
+                                        <t t-if="not line['status'] == 'cancel'">
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="line['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="line['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_from']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_to']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['meal']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['sgl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['dbl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['trp_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['twin_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['nights']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['trn']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['nights'] * line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['room_type']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['note']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-set="total_pax" t-value="total_pax + line['pax']"/>
+                                            <t t-set="total_sgl" t-value="total_sgl + line['sgl_room']"/>
+                                            <t t-set="total_dbl" t-value="total_dbl + line['dbl_room']"/>
+                                            <t t-set="total_trp" t-value="total_trp + line['trp_room']"/>
+                                            <t t-set="total_twin" t-value="total_twin + line['twin_room']"/>
+                                            <t t-set="total_rn" t-value="total_rn + line['nights']"/>
+                                            <t t-set="total_trn" t-value="total_trn + line['trn']"/>
+                                            <t t-set="total_bed" t-value="total_bed + (line['nights'] * line['pax'])"/>
+
+                                            <t t-set="sum_total_pax" t-value="sum_total_pax + line['pax']"/>
+                                            <t t-set="sum_total_sgl" t-value="sum_total_sgl + line['sgl_room']"/>
+                                            <t t-set="sum_total_dbl" t-value="sum_total_dbl + line['dbl_room']"/>
+                                            <t t-set="sum_total_trp" t-value="sum_total_trp + line['trp_room']"/>
+                                            <t t-set="sum_total_twin" t-value="sum_total_twin + line['twin_room']"/>
+                                            <t t-set="sum_total_rn" t-value="sum_total_rn + line['nights']"/>
+                                            <t t-set="sum_total_trn" t-value="sum_total_trn + line['trn']"/>
+                                            <t t-set="sum_total_bed"
+                                               t-value="sum_total_bed + (line['nights'] * line['pax'])"/>
+                                        </t>
+                                    </tr>
+                                </t>
+
+                                <t t-if="form[0]['date_filter'] == 'to_date'">
+                                    <tr t-foreach="sorted(order, key=lambda d: d['date_to']) " t-as="line">
+                                        <t t-if="line['status'] == 'cancel'">
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="line['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="line['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_from']" style="color:red;"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_to']" style="color:red;"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['meal']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['sgl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['dbl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['trp_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['twin_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['nights']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['trn']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['nights'] * line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['room_type']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="line['note']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-set="total_pax" t-value="total_pax + line['pax']"/>
+                                            <t t-set="total_sgl" t-value="total_sgl + line['sgl_room']"/>
+                                            <t t-set="total_dbl" t-value="total_dbl + line['dbl_room']"/>
+                                            <t t-set="total_trp" t-value="total_trp + line['trp_room']"/>
+                                            <t t-set="total_twin" t-value="total_twin + line['twin_room']"/>
+                                            <t t-set="total_rn" t-value="total_rn + line['nights']"/>
+                                            <t t-set="total_trn" t-value="total_trn + line['trn']"/>
+                                            <t t-set="total_bed" t-value="total_bed + (line['nights'] * line['pax'])"/>
+
+                                            <t t-set="sum_total_pax" t-value="sum_total_pax + line['pax']"/>
+                                            <t t-set="sum_total_sgl" t-value="sum_total_sgl + line['sgl_room']"/>
+                                            <t t-set="sum_total_dbl" t-value="sum_total_dbl + line['dbl_room']"/>
+                                            <t t-set="sum_total_trp" t-value="sum_total_trp + line['trp_room']"/>
+                                            <t t-set="sum_total_twin" t-value="sum_total_twin + line['twin_room']"/>
+                                            <t t-set="sum_total_rn" t-value="sum_total_rn + line['nights']"/>
+                                            <t t-set="sum_total_trn" t-value="sum_total_trn + line['trn']"/>
+                                            <t t-set="sum_total_bed"
+                                               t-value="sum_total_bed + (line['nights'] * line['pax'])"/>
+                                        </t>
+
+                                        <t t-if="not line['status'] == 'cancel'">
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="line['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="line['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_from']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['date_to']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['meal']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['sgl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['dbl_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['trp_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['twin_room']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['nights']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['trn']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['nights'] * line['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['room_type']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="line['note']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-set="total_pax" t-value="total_pax + line['pax']"/>
+                                            <t t-set="total_sgl" t-value="total_sgl + line['sgl_room']"/>
+                                            <t t-set="total_dbl" t-value="total_dbl + line['dbl_room']"/>
+                                            <t t-set="total_trp" t-value="total_trp + line['trp_room']"/>
+                                            <t t-set="total_twin" t-value="total_twin + line['twin_room']"/>
+                                            <t t-set="total_rn" t-value="total_rn + line['nights']"/>
+                                            <t t-set="total_trn" t-value="total_trn + line['trn']"/>
+                                            <t t-set="total_bed" t-value="total_bed + (line['nights'] * line['pax'])"/>
+
+                                            <t t-set="sum_total_pax" t-value="sum_total_pax + line['pax']"/>
+                                            <t t-set="sum_total_sgl" t-value="sum_total_sgl + line['sgl_room']"/>
+                                            <t t-set="sum_total_dbl" t-value="sum_total_dbl + line['dbl_room']"/>
+                                            <t t-set="sum_total_trp" t-value="sum_total_trp + line['trp_room']"/>
+                                            <t t-set="sum_total_twin" t-value="sum_total_twin + line['twin_room']"/>
+                                            <t t-set="sum_total_rn" t-value="sum_total_rn + line['nights']"/>
+                                            <t t-set="sum_total_trn" t-value="sum_total_trn + line['trn']"/>
+                                            <t t-set="sum_total_bed"
+                                               t-value="sum_total_bed + (line['nights'] * line['pax'])"/>
+                                        </t>
+                                    </tr>
+                                </t>
+
+                                <tr style="text-align:center">
+                                    <td style="border: 1px solid; padding:5px;" colspan="5">
+                                        Total:
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_pax"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_sgl"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_dbl"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_trp"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_twin"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_rn"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_trn"/>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                        <span t-esc="total_bed"/>
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </tr>
+                        <br/>
+                        <br/>
+                        <table style="width:100%" colspan="15">
+                            <thead>
+                                <tr style="background-color: silver; border: 1px solid;">
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total Pax
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total SGL
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total DBL
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total TRP
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total TWIN
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total R.N
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total T.R.N
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Total Bed N
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tr style="text-align:center;">
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_pax"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_sgl"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_dbl"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_trp"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_twin"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_rn"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_trn"/>
+                                </td>
+                                <td style="border: 1px solid; padding:5px; background-color:#F0F8FF;">
+                                    <span t-esc="sum_total_bed"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

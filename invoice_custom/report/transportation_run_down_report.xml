@@ -1,0 +1,225 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="action_report_transportation_run_down" model="ir.actions.report">
+        <field name="name">Transportation run down by arrival date</field>
+        <field name="model">sale.custom.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.transportation_run_down</field>
+        <field name="report_file">invoice_custom.transportation_run_down</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report_landscape"/>
+    </record>
+
+    <template id="invoice_custom.transportation_run_down">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="form" t-as="o">
+                    <div class="page" style="text-align:center">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            table {
+                            font-size: 17px;
+                            }
+                        </style>
+                        <h1>Axis DMC</h1>
+                        <h1>TRANSPORTATION RUN DOWN BY ARRIVAL DATE REPORT</h1>
+
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">From Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['from_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Issue Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">To Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['to_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Status :</b>
+                                        <t t-if="o['all_status']==True">
+                                            <span>All Status</span>
+                                        </t>
+                                        <t t-if="not o['all_status']==True and o['status_id']">
+                                            <span style="margin-right: 10px;" t-esc="o['status_id'][1]"/>
+                                        </t>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Transportation Name:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <t t-if="o['transportation_id']">
+                                            <span t-esc="o['transportation_id'][1]"/>
+                                        </t>
+
+                                        <t t-if="not o['transportation_id']">
+                                            <span>All TRANSPORTATION</span>
+                                        </t>
+
+                                    </td>
+
+
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <br/>
+                        <table style="width:100%" class="table table-sm o_main_table">
+                            <thead>
+                                <tr style="background-color: silver; border: 1px solid;">
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        File No.
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Transportation Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Group Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        From Date
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        To Date
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Type of vehicle
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Driver Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Pax
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Nationality
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Notes
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </thead>
+                            <t t-set="total_pax" t-value="0"/>
+                            <t t-if="form[0]['date_filter'] == 'from_date'">
+                                <tr t-foreach="sorted(orders, key=lambda d: d['date_from']) " t-as="order">
+                                    <tr t-if="order['status'][0] == 'cancel'">
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['file_no']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['transportation_name']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span style="color:red;" t-esc="order['customer']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['date_from']"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'
+                                                  style="color:red;"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['date_to']"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'
+                                                  style="color:red;"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['type_Vehicle']"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span style="color:red;" t-esc="order['driver_name']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['pax']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['nationality']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['note']"/>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                    <tr t-if="not order['status'][0] == 'cancel'">
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['file_no']"/>
+                                        </td>
+
+                                         <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span  t-esc="order['transportation_name']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="order['customer']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['date_from']"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'
+                                            />
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['date_to']"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'
+                                            />
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['type_Vehicle']"/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="order['driver_name']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['pax']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['nationality']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['note']"/>
+                                        </td>
+
+                                        <td style="display:none;">
+                                        </td>
+
+                                    </tr>
+                                    <t t-set="total_pax" t-value="total_pax + order['pax']"/>
+                                </tr>
+                                <tr style="text-align:center">
+                                    <td style="border: 1px solid; padding:5px;" colspan="6">
+                                        Total Pax:
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span t-esc="total_pax"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

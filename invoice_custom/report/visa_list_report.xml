@@ -1,0 +1,307 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <template id="visa_list123">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <style>
+                            tr { border:1px solid grey; height:30px; page-break-inside:avoid; }
+                            td, th { border:1px solid grey; vertical-align:middle; text-align:center; font-size:14px; }
+                            th { font-size:14px; }
+                            * { font-family: Garamond, serif; }
+                        </style>
+                        <h4 style="text-align:center">Axis DMC</h4>
+
+                        <table style="width:100%; border-spacing:0;">
+
+                            <tr>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">أسم المكتب السياحي
+                                </td>
+                                <td>
+                                    <span>الحلف للسياحة</span>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">شركه النقل</td>
+                                <td>
+                                    <span t-esc="o.transportation_id.name.name"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم الملف</td>
+                                <td>
+                                    <span t-esc="o.name"/>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم اللوحه</td>
+                                <td>
+                                      <span t-esc="o.transportation_id.palte_number"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">أسم المجموعه</td>
+                                <td>
+                                    <span t-esc="o.customer"/>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">أسم السائق</td>
+                                <td>
+                                    <span t-esc="o.transportation_id.driver_name"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم <الوطني>                                                                                                                                                                                                                                                                                                                                                                                                                                                       </الوطني>
+                                    للمنشأه
+                                </td>
+                                <td>
+                                    <span>2000178071</span>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم السائق</td>
+                                <td>
+                                   <span t-esc="o.transportation_id.driver_number"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم التسجيل</td>
+                                <td>
+                                    <span>57566</span>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم التسجيل لدى
+                                    وزاره السياحه
+                                </td>
+                                <td>
+                                    <span>300941</span>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:rgb(180, 198, 231);font-family: Garamond, serif;">أسم المندوب</td>
+                                <td>
+                                    <span t-esc="o.delegate_name"/>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">الدليل المرافق
+                                </td>
+                                <td>
+                                    <span t-esc="o.guide_id.name"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:rgb(180, 198, 231); font-font-family: Garamond, serif;">رقم المندوب</td>
+                                <td>
+                                    <span t-esc="o.delegate_number"/>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم الدليل</td>
+                                <td>
+                                    <span t-esc="o.guide_id.phone"/>
+                                    <t t-if="o.guide_id.phone and o.guide_id.mobile">
+                                        <span>/</span>
+                                    </t>
+                                    <span t-esc="o.guide_id.mobile"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">الجنسيه</td>
+                                <td>
+                                    <span t-esc="o.nationality_id.name"/>
+                                </td>
+                                <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">عدد الأشخاص</td>
+                                <td>
+                                    <span t-esc="o.total_pax"/>
+                                </td>
+                                <td style="display:none;">
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <table style="width:100%; border-spacing:0;">
+                            <t t-foreach="o.arrival_departure_expense_ids" t-as="arrival">
+                                <t t-if="arrival.show == True">
+                                <t t-if="arrival.name == 'ARR'">
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">تاريخ الوصول
+                                        </td>
+                                        <td>
+                                            <span t-esc="arrival.date"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">الوصول</td>
+                                        <td>
+                                            <span t-esc="arrival.border.name"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم الطائرة</td>
+                                        <td>
+                                            <span t-esc="arrival.flight"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">الوقت</td>
+                                        <td>
+                                            <span t-esc="arrival.str_time"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">عدد الاشخاص</td>
+                                        <td>
+                                            <span t-esc="arrival.pax"/>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+
+                                    </tr>
+                                </t>
+                                <t t-if="arrival.name == 'DEP'">
+                                    <tr>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">تاريخ المغادرة
+                                        </td>
+                                        <td>
+                                            <span t-esc="arrival.date"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">المغادرة</td>
+                                        <td>
+                                            <span t-esc="arrival.border.name"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">رقم الطائرة</td>
+                                        <td>
+                                            <span t-esc="arrival.flight"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">الوقت</td>
+                                        <td>
+                                            <span t-esc="arrival.str_time"/>
+                                        </td>
+                                        <td style="background:rgb(180, 198, 231); font-family: Garamond, serif;">عدد الاشخاص</td>
+                                        <td>
+                                            <span t-esc="arrival.pax"/>
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                            </t>
+                        </table>
+                        <h4 style="text-align:right; font-family: Garamond, serif;  font-size:14px;  ">:تفاصيل البرنامج</h4>
+                        <table style="width:100%; border-spacing:0;" dir="rtl">
+
+                            <tr>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif; width:100px;">
+                                    التاريخ
+                                </th>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                    التفاصيل
+                                </th>
+                            </tr>
+                            <t t-foreach="o.details_ids" t-as="detail">
+                                <tr>
+                                    <td>
+                                        <span t-esc="detail.date"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="detail.details"/>
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <br/>
+
+                        <table style="width:100%; border-spacing:0;">
+
+                            <tr>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif; width:100px;">
+                                    #
+                                </th>
+
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif; ">
+                                    Full Name
+                                </th>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                    Nationality
+                                </th>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                    DOB
+                                </th>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                    Passport
+                                </th>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                    Issue
+                                </th>
+                                <th style="background:rgb(180, 198, 231); font-family: Garamond, serif;">
+                                    Expiry Date
+                                </th>
+
+                            </tr>
+                            <t t-set="counter" t-value="1"/>
+                            <t t-foreach="o.clients_passport_ids" t-as="visa">
+                                <t t-if="visa.show == True">
+                                <tr>
+                                    <td>
+                                        <span t-esc="counter"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="visa.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="visa.nationality_id.name"/>
+
+                                    </td>
+                                    <td>
+                                        <span t-esc="visa.birth_date"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="visa.passport_number"/>
+
+                                    </td>
+                                    <td>
+
+                                        <span t-esc="visa.issue_date"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="visa.expiry_date"/>
+                                    </td>
+
+
+                                    <td style="display:none;">
+                                    </td>
+
+                                </tr>
+                                <t t-set="counter" t-value="counter +1"/>
+                            </t>
+                            </t>
+                        </table>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_visa_list" model="ir.actions.report">
+        <field name="name">visa list report</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.visa_list123</field>
+        <field name="report_file">invoice_custom.visa_list123</field>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_print_visa_list" model="ir.actions.server">
+        <field name="name">Print Visa List</field>
+        <field name="model_id" ref="model_sale_order"/>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="state">code</field>
+        <field name="sequence">1</field>
+        <field name="code">action = env.get('sale.order').print_visa_list()</field>
+    </record>
+
+</odoo>

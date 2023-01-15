@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="restaurant_reservation_form_report_wizard_form" model="ir.ui.view">
+        <field name="name">Restaurant Reservation Report wizard</field>
+        <field name="model">restaurant.reservation.form.report.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="name_of_restaurant"/>
+                    </group>
+                    <group>
+                        <field name="restaurant_ids" widget="many2many_checkboxes"/>
+
+                    </group>
+                </group>
+                <group>
+                    <group>
+                        <field name="show_reservation" attrs="{'invisible': [('show_voucher', '!=', False)]}" class="oe_inline"/>
+                        <field name="show_voucher" attrs="{'invisible': [('show_reservation', '!=', False)]}" />
+                        <field name="show_note"/>
+                        <field name="show_add_note"/>
+                    </group>
+                    <group>
+
+                    </group>
+                </group>
+                <footer>
+                    <button
+                            name="button_print_restaurant_reservation_form"
+                            string="Print"
+                            type="object"
+                            default_focus="1"
+                            class="oe_highlight"
+                    />
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_restaurant_reservation_form_report_wizard" model="ir.actions.act_window">
+        <field name="name">restaurant Reservation Report</field>
+        <field name="res_model">restaurant.reservation.form.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="restaurant_reservation_form_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

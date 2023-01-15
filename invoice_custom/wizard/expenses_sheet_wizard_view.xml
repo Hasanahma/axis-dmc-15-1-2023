@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="expenses_sheet_wizard_view" model="ir.ui.view">
+        <field name="name">Print Expenses Sheet</field>
+        <field name="model">expenses.sheet.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+
+                    <group>
+                        <field name="guide_or_transportation"/>
+                        <field name="account_id"/>
+                    </group>
+                    <group>
+                        <field name="deposit"/>
+                    </group>
+
+                </group>
+
+                <footer>
+                    <button
+                            name="button_print_expenses_sheet"
+                            string="Print"
+                            type="object"
+                            default_focus="1"
+                            class="oe_highlight"
+                    />
+
+                    <button id="button_close_expenses_sheet" style="margin-left: 15px;"
+                            name="button_close_expenses_sheet"
+                            string="Print And Lock" type="object"
+                            class="btn-primary"
+                    />
+
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_expenses_sheet_wizard" model="ir.actions.act_window">
+        <field name="name">Print Expenses Sheet</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">expenses.sheet.wizard</field>
+        <field name="domain">[]</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="expenses_sheet_wizard_view"/>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

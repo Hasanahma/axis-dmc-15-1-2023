@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <template id="invoice_report_inherit" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address">
+                Agent : <span t-field="o.partner_id"/>
+                <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: True}"/>
+                <div t-if="o.partner_id.vat" class="mt16">
+                    <t t-if="o.company_id.country_id.vat_label" t-esc="o.company_id.country_id.vat_label" id="inv_tax_id_label"/>
+                    <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
+                </div>
+                Customer : <span t-field="o.customer"/>
+                <br/>
+                Arrival Date	: <span t-field="o.arrival_date"/>
+                <br/>
+                Departure Date	: <span t-field="o.departure_date"/>
+            </t>
+        </xpath>
+        <xpath expr="//tr[@class='border-black o_total']" position="replace">
+            <tr class="border-black o_total">
+                <td name="td_amount_total_label">
+                    <strong>Total</strong>
+                    <![CDATA[&nbsp;]]><![CDATA[&nbsp;]]>
+                    <span t-field="o.currency_id.name"/>
+                </td>
+                <td name="td_amount_total" class="text-right">
+                    <span t-field="o.amount_total"/>
+                </td>
+            </tr>
+            <tr class="border-black o_total" t-if="o.other_currency_id">
+                <td name="td_amount_total_label">
+                    <strong>Total</strong>
+                    <![CDATA[&nbsp;]]><![CDATA[&nbsp;]]>
+                    <span t-field="o.other_currency_id.name"/>
+                </td>
+                <td name="td_amount_total" class="text-right">
+                    <span t-field="o.total_other_currency"/>
+                </td>
+            </tr>
+        </xpath> 
+    </template>
+
+    <template id="report_saleorder_document_custom_inherit" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address">
+                Agent : <span t-field="doc.partner_id"/>
+                <address t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: True}"/>
+                Customer : <span t-field="doc.customer"/>
+                <br/>
+                Arrival Date	: <span t-field="doc.arrival_date"/>
+                <br/>
+                Departure Date	: <span t-field="doc.departure_date"/>
+            </t>
+        </xpath>
+        <xpath expr="//tr[@class='border-black o_total']" position="replace">
+            <tr class="border-black o_total">
+                <td name="td_amount_total_label">
+                    <strong>Total</strong>
+                    <![CDATA[&nbsp;]]><![CDATA[&nbsp;]]>
+                    <span t-field="doc.currency_id.name"/>
+                </td>
+                <td name="td_amount_total" class="text-right">
+                    <span t-field="doc.amount_total"/>
+                </td>
+            </tr>
+            <tr class="border-black o_total" t-if="doc.other_currency_id">
+                <td name="td_amount_total_label">
+                    <strong>Total</strong>
+                    <![CDATA[&nbsp;]]><![CDATA[&nbsp;]]>
+                    <span t-field="doc.other_currency_id.name"/>
+                </td>
+                <td name="td_amount_total" class="text-right">
+                    <span t-field="doc.total_other_currency"/>
+                </td>
+            </tr>
+        </xpath> 
+    </template>
+</odoo>
+

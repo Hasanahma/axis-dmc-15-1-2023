@@ -1,0 +1,374 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <data>
+        <record id="hotel_email" model="mail.template">
+            <field name="name">Hotel Email</field>
+            <field name="model_id" ref="invoice_custom.model_hotel_reservation_form_report_wizard"></field>
+            <field name="email_from">${object.email_from.email_formatted |safe}</field>
+            <field name="partner_to">${object.name_of_hotel.id}</field>
+            <!-- <field name="email_cc">${(self.env.user.login)|safe}</field> -->
+            <field name="subject"><![CDATA[${ctx['subject']}]]></field>
+            <field name="body_html"><![CDATA[
+                    <p><strong>Dear team</strong></p>
+                    <p>Greetings from Axis DMC</p>
+                    <p>Please be kind to book & confirm below / attached reservation:</p>
+                    <br/>
+
+                    <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    % if object.show_reservation:
+                        <h4 style="text-align:center">HOTEL RESERVATION FORM</h4>
+                    % endif
+                    % if object.show_voucher:
+                        <h4 style="text-align:center">HOTEL VOUCHER</h4>
+                    % endif
+                    <table style="border:none;">
+                            <tr>
+                                <td style="width:10%; border-right:none;">
+                                % if object.object_sale_order.customer:
+                                    <b>Group Name:</b>
+                                % endif
+                                </td>
+                                <td style="margin-left:50px; width: 50%; border-right:none; background-color: #ffffff;">
+                                % if object.object_sale_order.customer:
+                                    ${object.object_sale_order.customer}
+                                % endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:10%; border-right:none;">
+                                % if object.object_sale_order.nationality_id.name:
+                                    <b>Nationality:</b>
+                                % endif
+                                </td>
+                                <td style="margin-left:50px; width: 50%; border-right:none; background-color: #ffffff;">
+                                % if object.object_sale_order.nationality_id.name:
+                                    ${object.object_sale_order.nationality_id.name}
+                                % endif
+                                </td>
+                            </tr>
+                        </table>
+
+                        <br/>
+
+                        % if object.hotel_ids:
+                            <h4 style="text-align:center">Room Requirement</h4>
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check In
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Check Out
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Meal
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Pax
+                                        </td>
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Room Type
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Sgl
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Dbl
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Trp
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Twin
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+                                </thead>
+
+
+
+
+                                % for h in object.hotel_ids:
+                                <tr>
+
+
+                                    <td style="border: 1px solid; padding:5px; text-align:center;" >
+                                           ${(str(h.date_from).split('-')[2]).split(' ')[0] + '-' + str(h.date_from).split('-')[1] + '-' + str(h.date_from).split('-')[0]}
+
+
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+
+                                           ${(str(h.date_to).split('-')[2]).split(' ')[0] + '-' + str(h.date_to).split('-')[1] + '-' + str(h.date_to).split('-')[0]}
+
+
+                                    </td>
+
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+
+                                            ${h.meal_id.name}
+
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+
+                                        % if h.pax:
+
+                                            ${h.pax}
+
+                                        % endif
+
+                                        % if not h.pax:
+                                            <span>0</span>
+                                        % endif
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+
+                                        % if h.room_category_id:
+
+                                            ${h.room_category_id.name}
+                                        % endif
+
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+
+                                        % if h.sgl_room:
+                                            ${h.sgl_room}
+                                        % endif
+
+                                        <t t-if="not h.sgl_room">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        % if h.dbl_room:
+                                            ${h.dbl_room}
+                                        % endif
+
+
+                                        % if not h.dbl_room:
+                                            <span>0</span>
+                                        % endif
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        % if h.trp_room:
+                                            ${h.trp_room}
+                                        % endif
+
+
+                                        % if not h.trp_room:
+                                            <span>0</span>
+                                        % endif
+
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px; text-align:center;">
+                                        % if h.twin_room:
+                                            ${h.twin_room}
+                                        % endif
+
+
+                                        % if not h.twin_room:
+                                            <span>0</span>
+                                        % endif
+
+                                    </td>
+                                    <td style="display:none;">
+
+                                    </td>
+
+
+                                </tr>
+                                % endfor
+                            </table>
+                        % endif
+
+                    </p>
+                    </div>
+                    <br/>
+
+                    % if object.show_note:
+                            <div style="width:100%">
+                                <div style="float:left; text-align:left">
+                                    <strong style="margin-right:50px;">Notes:</strong>
+                                </div>
+
+                                <div style="float:left;">
+                                    % for h in object.hotel_ids:
+                                    <tr>
+                                    % if h.note:
+                                        ${h.note}
+                                    % endif
+                                        <br/>
+                                    </tr>
+                                    % endfor
+
+                                </div>
+                            </div>
+                        % endif
+                        <br/>
+                        <br/>
+
+                        % if object.show_add_note:
+                            <div style="width:100%">
+                                <div style="float:left; text-align:left">
+                                    <strong style="margin-right:50px;">Add. Notes:</strong>
+                                </div>
+
+                                <div style="float:left;">
+                                    % for h in object.hotel_ids:
+                                    <tr>
+                                    % if h.additional_note:
+                                        ${h.additional_note}
+                                    % endif
+
+                                        <br/>
+                                    </tr>
+                                    % endfor
+
+                                </div>
+                            </div>
+                        % endif
+                        <br/>
+                    <br/>
+
+
+
+                    % if object.show_client:
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            client name
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Room type
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            comment
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+                                </thead>
+                                % for room in ctx['rooms_list']:
+
+
+                                    <tr>
+
+                                        <td rowspan=${room['len_of_clients']} style="border: 1px solid; text-align:center; padding:5px;">
+
+                                            ${room['number']}
+                                        </td>
+
+                                        <td style="border: 1px solid; padding:5px;">
+
+                                            ${room['clients'][0]['name']}
+
+                                        </td>
+
+                                        <td rowspan=${room['len_of_clients']} style="border: 1px solid; padding:5px;">
+
+                                            % if room['type']:
+
+                                                ${room['type']}
+                                            % endif
+                                        </td>
+
+                                        <td style="border: 1px solid;padding:5px;">
+                                            % if room['clients'][0]['comment']:
+                                            ${room['clients'][0]['comment']}
+                                            % endif
+                                        </td>
+
+                                        <td style="display:none;"></td>
+                                    </tr>
+
+
+                                    % if room['clients']:
+                                    % for client in room['clients'][1:]:
+                                        <tr>
+
+                                            <td style="border: 1px solid; padding:5px;">
+
+                                                % if client['name']:
+                                                    ${client['name']}
+                                                % endif
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                % if client['comment']:
+                                                    ${client['comment']}
+                                                % endif
+
+                                            </td>
+
+                                            <td style="display:none;"></td>
+
+                                        </tr>
+                                     % endfor
+                                     % endif
+
+
+
+
+                                % endfor
+
+                            </table>
+                    % endif
+                    <br/>
+
+
+                    % if object.show_client:
+                            <table style="width:100%">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                    <td style="border: 1px black solid; text-align:center;">SGL</td>
+                                    <td style="border: 1px black solid; text-align:center;">DBL</td>
+                                    <td style="border: 1px black solid; text-align:center;">TWN</td>
+                                    <td style="border: 1px black solid; text-align:center;">TRP</td>
+                                    <td style="border: 1px black solid; text-align:center;">TOTAL Rooms</td>
+                                    </tr>
+                                </thead>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    ${ctx['counter_sgl']}
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    ${ctx['counter_dbl']}
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    ${ctx['counter_twn']}
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    ${ctx['counter_trp']}
+                                </td>
+                                <td style="border: 1px solid; text-align:center; padding:5px;">
+
+                                    ${ctx['counter_total']}
+                                </td>
+                            </table>
+                        % endif
+
+                    <br/>
+                    <p>Waiting your kind reply by return & many thanks for your kind support</p>
+                    ]]>
+            </field>
+            <field name="report_template" ref="invoice_custom.action_hotel_reservation_form_report"/>
+            <field name="report_name">Hotel Reservation Form</field>
+        </record>
+    </data>
+
+</odoo>

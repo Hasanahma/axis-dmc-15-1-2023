@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_contract.hotel,contract.hotel,model_contract_hotel,base.group_user,1,1,1,1
+access_contract.transportation,contract.transportation,model_contract_transportation,base.group_user,1,1,1,1
+access_route.services,route.services,model_route_services,base.group_user,1,1,1,1
+access_route.by,route.by,model_route_by,base.group_user,1,1,1,1
+access_car.van,car.van,model_car_van,base.group_user,1,1,1,1
+access_contract.restaurant,contract.restaurant,model_contract_restaurant,base.group_user,1,1,1,1
+access_contract.guide,contract.guide,model_contract_guide,base.group_user,1,1,1,1
+access_hotel_season,hotel_season,model_hotel_season,base.group_user,1,1,1,1
+access_hotel_promotion,hotel_promotion,model_hotel_promotion,base.group_user,1,1,1,1
+access_hotel_rates,hotel_rates,model_hotel_rates,base.group_user,1,1,1,1
+access_seasonality_lines,seasonality_lines,model_seasonality_lines,base.group_user,1,1,1,1
+access_promotion_lines,promotion_lines,model_promotion_lines,base.group_user,1,1,1,1
+access_rates_lines,rates_lines,model_rates_lines,base.group_user,1,1,1,1
+

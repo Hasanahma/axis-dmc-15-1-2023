@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hotel_bill_wizard_form_view" model="ir.ui.view">
+        <field name="name">Hotel Bill wizard</field>
+        <field name="model">hotel.bill.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="name_of_hotel"/>
+                    </group>
+                    <group>
+                        <field name="hotel_ids" widget="many2many_checkboxes"/>
+                    </group>
+                </group>
+
+                <footer>
+<!--                    <button-->
+<!--                            name="button_print_hotel_reservation_form"-->
+<!--                            string="Print"-->
+<!--                            type="object"-->
+<!--                            default_focus="1"-->
+<!--                            class="oe_highlight"-->
+<!--                    />-->
+
+                    <button
+                            name="button_create_hotel_bill"
+                            string="Create Bill"
+                            type="object"
+                            default_focus="1"
+                            class="oe_highlight"
+                    />
+
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hotel_bill_wizard" model="ir.actions.act_window">
+        <field name="name">Hotel Bill Wizard</field>
+        <field name="res_model">hotel.bill.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hotel_bill_wizard_form_view"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

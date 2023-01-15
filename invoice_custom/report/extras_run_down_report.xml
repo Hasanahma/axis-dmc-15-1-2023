@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="action_report_extras_run_down" model="ir.actions.report">
+        <field name="name">Extras run down by arrival date</field>
+        <field name="model">sale.custom.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.extras_run_down</field>
+        <field name="report_file">invoice_custom.extras_run_down</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report_landscape"/>
+    </record>
+
+    <template id="invoice_custom.extras_run_down">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="form" t-as="o">
+                    <div class="page" style="text-align:center">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            table {
+                            font-size: 17px;
+                            }
+                        </style>
+
+                        <h1>Axis DMC</h1>
+                        <h1>EXTRAS RUN DOWN BY ARRIVAL DATE REPORT</h1>
+
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">From Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['from_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Issue Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">To Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['to_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Supplier Name:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <t t-if="o['supplier_id']">
+                                            <span t-esc="o['supplier_id'][1]"/>
+                                        </t>
+                                        <t t-if="not o['supplier_id'][1]">
+                                            <span>All Supplier</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <br/>
+
+                        <table style="width:100%" class="table table-sm o_main_table">
+                            <thead>
+                                <tr style="background-color: silver; border: 1px solid;">
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        File No.
+                                    </td>
+
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Supplier Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Date
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Group Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Service Name
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Pax
+                                    </td>
+                                    <td style="border: 1px black solid; text-align:center;">
+                                        Notes
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </thead>
+
+
+                                <tr t-foreach="sorted(orders, key=lambda d: d['date']) " t-as="order">
+                                    <tr t-if="order['status'] == ['cancel']">
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['file_no']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['supplier_name']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['date']"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span style="color:red;" t-esc="order['customer']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['name']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['pax']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span style="color:red;" t-esc="order['note']"/>
+                                        </td>
+                                        <td style="display:none;">
+
+                                        </td>
+                                    </tr>
+
+                                    <tr t-if="not order['status'] == ['cancel']">
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['file_no']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['supplier_name']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['date']"
+                                                  t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        </td>
+                                        <td style="border: 1px solid; padding:5px;">
+                                            <span t-esc="order['customer']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['name']"/>
+                                        </td>
+
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['pax']"/>
+                                        </td>
+                                        <td style="border: 1px solid; text-align:center; padding:5px;">
+                                            <span t-esc="order['note']"/>
+                                        </td>
+
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </tr>
+
+
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

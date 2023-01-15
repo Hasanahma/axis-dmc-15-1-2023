@@ -1,0 +1,302 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <!--     operation => extras (menu & action & view)-->
+        <record id="extras_operation_view_tree" model="ir.ui.view">
+            <field name="name">Extras</field>
+            <field name="model">extras</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status_of_sale_order == 'cancel'" default_order='date'>
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="name"/>
+                    <field name="supplier_id"/>
+                    <field name="date"/>
+                    <field name="adult"/>
+                    <field name="child"/>
+                    <field name="note"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="extras_operation_action" model="ir.actions.act_window">
+            <field name="name">Extras</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">extras</field>
+            <field name="view_id" ref="extras_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <!--     operation => Entrance (menu & action & view)-->
+        <record id="entrance_operation_view_tree" model="ir.ui.view">
+            <field name="name">Entrance</field>
+            <field name="model">entrance</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status_of_sale_order == 'cancel'" default_order='date' >
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="adult"/>
+                    <field name="child"/>
+                    <field name="note"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="entrance_operation_action" model="ir.actions.act_window">
+            <field name="name">Entrance</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">entrance</field>
+            <field name="view_id" ref="entrance_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <!--     operation => Guide (menu & action & view)-->
+        <record id="guide_operation_view_tree" model="ir.ui.view">
+            <field name="name">Guide</field>
+            <field name="model">guide</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status_of_sale_order == 'cancel'">
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="name"/>
+                    <field name="guide_number"/>
+                    <field name="language_id"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="note"/>
+                    <field name="status_id"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="guide_operation_action" model="ir.actions.act_window">
+            <field name="name">Guide</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">guide</field>
+            <field name="view_id" ref="guide_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <!--     operation => Transportations (menu & action & view)-->
+        <record id="transportations_operation_view_tree" model="ir.ui.view">
+            <field name="name">Transportation</field>
+            <field name="model">transportation</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status_of_sale_order == 'cancel'" default_order='date_from' >
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="name" domain="[('expense_partner_ids.id','=', 2)]"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="pax"/>
+                    <field name="note"/>
+                    <field name="status_id"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="transportations_operation_action" model="ir.actions.act_window">
+            <field name="name">Transportation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transportation</field>
+            <field name="view_id" ref="transportations_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <!--     operation => Resturnats (menu & action & view)-->
+        <record id="restaurants_operation_view_tree" model="ir.ui.view">
+            <field name="name">restaurants.tree.view</field>
+            <field name="model">restaurants</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status_of_sale_order == 'cancel'" default_order='date' >
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="pax"/>
+                    <field name="meal_id"/>
+                    <field name="note"/>
+                    <field name="status_id"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="restaurants_operation_action" model="ir.actions.act_window">
+            <field name="name">Restaurants</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">restaurants</field>
+            <field name="view_id" ref="restaurants_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <!--     operation => Program / Itinerary (menu & action & view)-->
+        <record id="program_itinerary_operation_view_tree" model="ir.ui.view">
+            <field name="name">Program.Itinerary.tree.view</field>
+            <field name="model">itineraries</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status_of_sale_order == 'cancel'" default_order='from_date' >
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="from_date"/>
+                    <field name="name"/>
+                    <field name="type_service_id"/>
+                    <field name="guide_name_id"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="program_itinerary_operation_action" model="ir.actions.act_window">
+            <field name="name">Program / Itinerary</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">itineraries</field>
+            <field name="view_id" ref="program_itinerary_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <!--    operation => Arrival / Departure (menu & action & view)-->
+        <record id="arrival_departure_operation_view_tree" model="ir.ui.view">
+            <field name="name">Arrival.Departure.tree.view</field>
+            <field name="model">arrival.departure.expense</field>
+            <field name="arch" type="xml">
+                <tree string="" default_order="date" decoration-danger="status_of_sale_order == 'cancel'">
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="name" string="Arr/ Dep"/>
+                    <field name="date"/>
+                    <field name="border"/>
+                    <field name="flight"/>
+                    <field name="time" widget="float_time" invisible="1"/>
+                    <field name="str_time"/>
+                    <field name="pax"/>
+                    <field name="meet_by"/>
+                    <field name="notes"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="arrival_departure_operation_action" model="ir.actions.act_window">
+            <field name="name">Arrival / Departure</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">arrival.departure.expense</field>
+            <field name="view_id" ref="arrival_departure_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <!--    operation => hotels (menu & action & view)-->
+        <record id="hotels_operation_view_tree" model="ir.ui.view">
+            <field name="name">Hotels.tree.view</field>
+            <field name="model">hotels</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status_of_sale_order == 'cancel'" default_order='date_from'>
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="customer"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="name"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="room_category_id"/>
+                    <field name="meal_id"/>
+                    <field name="pax" sum="sum of pax"/>
+                    <field name="sgl_room" sum="sum of sgl_room"/>
+                    <field name="dbl_room" sum="sum of dbl_room"/>
+                    <field name="trp_room" sum="sum of trp_room"/>
+                    <field name="twin_room" sum="sum of twin_room"/>
+                    <field name="oth_room" sum="sum of oth_room"/>
+                    <field name="status_id"/>
+                    <field name="status_of_sale_order" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="hotels_operation_action" model="ir.actions.act_window">
+            <field name="name">Hotels</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hotels</field>
+            <field name="view_id" ref="hotels_operation_view_tree"/>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="operations_module"
+                  name="Operations"
+                  web_icon="invoice_custom,static/operation_logo.png"
+                  action="arrival_departure_operation_action"
+                  sequence="6"/>
+
+        <menuitem id="operation_menu"
+                  name="Operations"
+                  parent="operations_module"
+                  action="arrival_departure_operation_action"
+                  sequence="1"/>
+
+        <menuitem id="operations_hotels_menu"
+                  name="Hotels"
+                  parent="operation_menu"
+                  sequence="2"
+                  action="hotels_operation_action"/>
+
+        <menuitem id="extras_operation_menu"
+                  name="Extras"
+                  parent="operation_menu"
+                  sequence="10"
+                  action="extras_operation_action"/>
+
+        <menuitem id="entrance_operation_menu"
+                  name="Entrance"
+                  parent="operation_menu"
+                  sequence="7"
+                  action="entrance_operation_action"/>
+
+        <menuitem id="arrival_departure_operation_menu"
+                  name="Arrival / Departure"
+                  parent="operation_menu"
+                  sequence="1"
+                  action="arrival_departure_operation_action"/>
+
+        <menuitem id="program_itinerary_operation_menu"
+                  name="Program / Itinerary"
+                  parent="operation_menu"
+                  sequence="3"
+                  action="program_itinerary_operation_action"/>
+
+        <menuitem id="guide_operation_menu"
+                  name="Guide"
+                  parent="operation_menu"
+                  sequence="6"
+                  action="guide_operation_action"/>
+
+        <menuitem id="restaurants_operation_menu"
+                  name="Restaurant"
+                  parent="operation_menu"
+                  sequence="4"
+                  action="restaurants_operation_action"/>
+
+        <menuitem id="_transportation_operation_menu"
+                  name="Transportation"
+                  parent="operation_menu"
+                  sequence="5"
+                  action="transportations_operation_action"/>
+    </data>
+</odoo>

@@ -1,0 +1,504 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+
+    <record id="action_report_arr_dep" model="ir.actions.report">
+        <field name="name">Arr/Dep</field>
+        <field name="model">sale.custom.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_custom.arr_dep</field>
+        <field name="report_file">invoice_custom.arr_dep</field>
+        <field name="paperformat_id" ref="custom_paper_format_qweb_report_landscape"/>
+    </record>
+
+    <template id="invoice_custom.arr_dep">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" style="background:unset">
+                <t t-foreach="form" t-as="o">
+                    <div class="page" style="text-align:center">
+                        <style>
+                            .page .header-table td{
+                            border:none !important;
+                            }
+                            .page > table tr td:last-child{
+                            background:unset !important;
+                            }
+                            table {
+                            font-size: 17px;
+                            }
+                        </style>
+                        <h1>Axis DMC</h1>
+                        <h1>Arrivals/Departures REPORT</h1>
+                        <div style="width:100%; border: 1px solid black; padding:1%;">
+                            <table style="width:100%; border:none;" class="header-table" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">From Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['from_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">To Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="o['to_date']"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <b style="margin-right: 10px;">Issue Date:</b>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/>
+                                    </td>
+                                    <td style="display:none;">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <br/>
+                        <t t-if="form[0]['by_group'] == 'arrival' or form[0]['by_group'] == 'both'">
+<!--                            <t t-if="form[0]['show'] == 'cancel' or form[0]['show'] == 'both'">-->
+
+                            <h2>Arrivals</h2>
+
+                            <!--                         <div style="width:100%; border: 1px solid black; padding:1%;">-->
+                            <table class="table table-sm o_main_table">
+
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            File No.
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Agent Name
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Group Name
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Pax
+                                        </td>
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Border
+                                        </td>
+                                        <td style="border: 1px black soli
+
+
+
+                                        d; text-align:center;">
+                                            Flight
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Time
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Hotels
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Transportation
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Guide
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Nat.
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Meet
+                                        </td>
+                                        <!--                                        <td style="border: 1px black solid; text-align:center;">-->
+                                        <!--                                            Driver Name-->
+                                        <!--                                        </td>-->
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Date
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+
+                                    </tr>
+                                </thead>
+                                <t t-set="total_arr_pax" t-value="0"/>
+                                <t t-set="seq" t-value="1"/>
+
+                                <tr t-foreach="orders" t-as="order">
+                                    <tr t-if="order['status'] == 'cancel'">
+                                        <t t-if="order['name'] == 'ARR'">
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="seq"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['agent']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['border']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['flight']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['time']"
+                                                      t-options='{"widget": "float_time"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <t t-if="order.get('hotel')">
+                                                    <t t-foreach="order['hotel']" t-as="hotel">
+                                                        <span style="color:red;" t-esc="hotel"/>
+                                                        <br/>
+                                                        <br/>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['transportation']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['guide']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['nationality']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['meet']"/>
+                                            </td>
+                                            <!--                                        <td style="border: 1px solid; padding:5px;">-->
+                                            <!--                                            <span t-esc="order['driver_name']"/>-->
+                                            <!--                                        </td>-->
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['date']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['notes']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-if="order['pax']">
+                                                <t t-set="total_arr_pax" t-value="total_arr_pax + order['pax']"/>
+                                            </t>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </tr>
+                                    <tr t-if="not order['status'] == 'cancel'">
+                                        <t t-if="order['name'] == 'ARR'">
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['agent']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['border']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['flight']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['time']" t-options='{"widget": "float_time"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <t t-if="order.get('hotel')">
+                                                    <t t-foreach="order['hotel']" t-as="hotel">
+                                                        <span t-esc="hotel"/>
+                                                        <br/>
+                                                        <br/>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['transportation']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['guide']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['nationality']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['meet']"/>
+                                            </td>
+                                            <!--                                        <td style="border: 1px solid; padding:5px;">-->
+                                            <!--                                            <span t-esc="order['driver_name']"/>-->
+                                            <!--                                        </td>-->
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['date']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['notes']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-if="order['pax']">
+                                                <t t-set="total_arr_pax" t-value="total_arr_pax + order['pax']"/>
+                                            </t>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+
+                                    </tr>
+                                </tr>
+                                <tr style="text-align:center">
+                                    <td style="border: 1px solid; padding:5px;" colspan="4">
+                                        Total Pax:
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span t-esc="total_arr_pax"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!--                        </div>-->
+                        </t>
+<!--                        </t>-->
+
+
+                        <t t-if="form[0]['by_group'] == 'departure' or form[0]['by_group'] == 'both'">
+                            <h2>Departures</h2>
+
+
+                            <!--                        <div style="width:100%; border: 1px solid black; padding:1%;">-->
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr style="background-color: silver; border: 1px solid;">
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            #
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            File No.
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Agent Name
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Group Name
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Pax
+                                        </td>
+
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Border
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Flight
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Time
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Hotels
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Transportation
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Guide
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Nat.
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Meet
+                                        </td>
+                                        <!--                                        <td style="border: 1px black solid; text-align:center;">-->
+                                        <!--                                            Driver Name-->
+                                        <!--                                        </td>-->
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Date
+                                        </td>
+                                        <td style="border: 1px black solid; text-align:center;">
+                                            Notes
+                                        </td>
+                                        <td style="display:none;">
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <t t-set="total_dep_pax" t-value="0"/>
+                                <t t-set="seq" t-value="1"/>
+                                <tr t-foreach="orders" t-as="order">
+                                    <t t-if="order['status'] == 'cancel'">
+                                        <t t-if="not order['name'] == 'ARR'">
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="seq"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['agent']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span style="color:red;" t-esc="order['border']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['flight']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['time']"
+                                                      t-options='{"widget": "float_time"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <t t-if="order.get('hotel')">
+                                                    <t t-foreach="list(order['hotel'])" t-as="hotel">
+                                                        <span style="color:red;" t-esc="hotel"/>
+                                                        <br/>
+                                                        <br/>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['transportation']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['guide']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['nationality']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['meet']"/>
+                                            </td>
+                                            <!--                                        <td style="border: 1px solid; padding:5px;">-->
+                                            <!--                                            <span t-esc="order['driver_name']"/>-->
+                                            <!--                                        </td>-->
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['date']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span style="color:red;" t-esc="order['notes']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-if="order['pax']">
+                                                <t t-set="total_dep_pax" t-value="total_dep_pax + order['pax']"/>
+                                            </t>
+                                            <t t-set="seq" t-value="seq +1"/>
+                                        </t>
+                                    </t>
+
+                                    <t t-if="not order['status'] == 'cancel'">
+                                        <t t-if="not order['name'] == 'ARR'">
+
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="seq"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['file_no']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['agent']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['customer']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['pax']"/>
+                                            </td>
+                                            <td style="border: 1px solid; text-align:center; padding:5px;">
+                                                <span t-esc="order['border']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['flight']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['time']"
+                                                     t-options='{"widget": "float_time"}'/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <t t-if="order.get('hotel')">
+                                                    <t t-foreach="list(order['hotel'])" t-as="hotel">
+                                                        <span t-esc="hotel"/>
+                                                        <br/>
+                                                        <br/>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['transportation']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['guide']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['nationality']"/>
+                                            </td>
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['meet']"/>
+                                            </td>
+                                            <!--                                        <td style="border: 1px solid; padding:5px;">-->
+                                            <!--                                            <span t-esc="order['driver_name']"/>-->
+                                            <!--                                        </td>-->
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['date']"
+                                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                            </td>
+
+                                            <td style="border: 1px solid; padding:5px;">
+                                                <span t-esc="order['notes']"/>
+                                            </td>
+                                            <td style="display:none;">
+                                            </td>
+                                            <t t-if="order['pax']">
+                                                <t t-set="total_dep_pax" t-value="total_dep_pax + order['pax']"/>
+                                            </t>
+                                            <t t-set="seq" t-value="seq +1"/>
+
+                                        </t>
+                                    </t>
+
+
+                                </tr>
+                                <tr style="text-align:center">
+                                    <td style="border: 1px solid; padding:5px;" colspan="4">
+                                        Total Pax:
+                                    </td>
+                                    <td style="border: 1px solid; padding:5px;">
+                                        <span t-esc="total_dep_pax"/>
+                                    </td>
+                                </tr>
+
+
+                            </table>
+                            <!--                        </div>-->
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
